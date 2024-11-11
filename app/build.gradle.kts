@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.vordead.snoozeloo"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.vordead.snoozeloo"
