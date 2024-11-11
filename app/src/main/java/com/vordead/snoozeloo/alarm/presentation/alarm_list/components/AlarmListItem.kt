@@ -13,10 +13,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,28 +20,36 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vordead.snoozeloo.alarm.presentation.models.AlarmListItemUi
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 
 @Composable
-fun AlarmListItem(modifier: Modifier = Modifier) {
-    var checked by remember { mutableStateOf(true) }
+fun AlarmListItem(
+    alarmListItemUi: AlarmListItemUi,
+    onAlarmSwitchClick: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .background(Color.White)
             .padding(16.dp),
     ) {
         AlarmHeader(
-            title = "Wake Up",
-            checked = checked,
-            onCheckedChange = { checked = it }
+            title = alarmListItemUi.title,
+            checked = alarmListItemUi.isEnabled,
+            onCheckedChange = { onAlarmSwitchClick(it) }
         )
         TimeDisplay(time = "10:00", period = "AM")
-        AlarmFooter()
+        AlarmFooter("30min")
     }
 }
 
 @Composable
-fun AlarmHeader(title: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+fun AlarmHeader(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -74,7 +78,11 @@ fun AlarmHeader(title: String, checked: Boolean, onCheckedChange: (Boolean) -> U
 }
 
 @Composable
-fun TimeDisplay(time: String, period: String, modifier: Modifier = Modifier) {
+fun TimeDisplay(
+    time: String,
+    period: String,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.Bottom,
@@ -101,9 +109,11 @@ fun TimeDisplay(time: String, period: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AlarmFooter() {
+fun AlarmFooter(
+    remainingTime: String
+) {
     Text(
-        text = "Alarm in 30min",
+        text = "Alarm in $remainingTime",
         modifier = Modifier.padding(top = 8.dp),
         style = MaterialTheme.typography.bodyMedium.copy(
             fontSize = 14.sp,
@@ -117,6 +127,16 @@ fun AlarmFooter() {
 @Composable
 private fun AlarmListItemPreview() {
     SnoozelooBackground {
-        AlarmListItem()
+        AlarmListItem(
+            alarmListItemUi = AlarmListItemUi(
+                id = "1",
+                title = "Wake Up",
+                time = "10:00",
+                period = "AM",
+                remainingTime = "30min",
+                isEnabled = true
+            ),
+            onAlarmSwitchClick = {}
+        )
     }
 }
