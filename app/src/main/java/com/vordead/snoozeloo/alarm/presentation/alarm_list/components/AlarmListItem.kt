@@ -1,6 +1,7 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_list.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -27,20 +30,26 @@ import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 fun AlarmListItem(
     alarmListItemUi: AlarmListItemUi,
     onAlarmSwitchClick: (Boolean) -> Unit,
+    onAlarmClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .background(Color.White)
-            .padding(16.dp),
+    Card(
+        modifier.clickable { onAlarmClick() },
+        shape = RoundedCornerShape(10.dp),
     ) {
-        AlarmHeader(
-            title = alarmListItemUi.title,
-            checked = alarmListItemUi.isEnabled,
-            onCheckedChange = { onAlarmSwitchClick(it) }
-        )
-        TimeDisplay(time = "10:00", period = "AM")
-        AlarmFooter("30min")
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(16.dp),
+        ) {
+            AlarmHeader(
+                title = alarmListItemUi.title,
+                checked = alarmListItemUi.isEnabled,
+                onCheckedChange = { onAlarmSwitchClick(it) }
+            )
+            TimeDisplay(time = "10:00", period = "AM")
+            AlarmFooter("30min")
+        }
     }
 }
 
@@ -136,6 +145,7 @@ private fun AlarmListItemPreview() {
                 remainingTime = "30min",
                 isEnabled = true
             ),
+            onAlarmClick = {},
             onAlarmSwitchClick = {}
         )
     }
