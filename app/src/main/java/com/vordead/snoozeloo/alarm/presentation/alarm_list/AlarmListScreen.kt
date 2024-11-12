@@ -7,16 +7,11 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AddAlarmFab
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AlarmList
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AppBar
@@ -34,8 +29,7 @@ fun AlarmListScreen(
             AddAlarmFab(
                 onClick = { AlarmListAction.onCreateAlarmClick },
                 modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(bottom = 30.dp),
+                    .padding(bottom = 20.dp)
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
