@@ -26,7 +26,17 @@ class AlarmListViewModel @Inject constructor() : ViewModel() {
 
     fun onAlarmSwitchClick(alarmId: String, isChecked: Boolean) {
         viewModelScope.launch {
-
+            _alarmListState.update {
+                it.copy(
+                    alarms = it.alarms.map { alarm ->
+                        if (alarm.id == alarmId) {
+                            alarm.copy(isEnabled = isChecked)
+                        } else {
+                            alarm
+                        }
+                    }
+                )
+            }
         }
     }
 
@@ -42,7 +52,47 @@ class AlarmListViewModel @Inject constructor() : ViewModel() {
                             period = "AM",
                             remainingTime = "30min",
                             isEnabled = false
-                        )
+                        ),
+                        AlarmListItemUi(
+                            id = "2",
+                            title = "Alarm 2",
+                            time = "11:00",
+                            period = "AM",
+                            remainingTime = "1h",
+                            isEnabled = true
+                        ),
+                        AlarmListItemUi(
+                            id = "3",
+                            title = "Alarm 3",
+                            time = "12:00",
+                            period = "PM",
+                            remainingTime = "2h",
+                            isEnabled = false
+                        ),
+                        AlarmListItemUi(
+                            id = "4",
+                            title = "Alarm 4",
+                            time = "01:00",
+                            period = "PM",
+                            remainingTime = "3h",
+                            isEnabled = true
+                        ),
+                        AlarmListItemUi(
+                            id = "5",
+                            title = "Alarm 5",
+                            time = "02:00",
+                            period = "PM",
+                            remainingTime = "4h",
+                            isEnabled = false
+                        ),
+                        AlarmListItemUi(
+                            id = "6",
+                            title = "Alarm 6",
+                            time = "03:00",
+                            period = "PM",
+                            remainingTime = "5h",
+                            isEnabled = true
+                        ),
                     )
                 )
             }
