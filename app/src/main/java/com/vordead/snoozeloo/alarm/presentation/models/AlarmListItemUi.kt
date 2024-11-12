@@ -5,6 +5,6 @@ data class AlarmListItemUi(
     val title: String,
     val time: String,
     val period: String,
-    val isEnabled: Boolean,
+    val isEnabled: Boolean = false,
     val remainingTime: String
 )
