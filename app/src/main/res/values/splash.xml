@@ -4,5 +4,6 @@
         <item name="windowSplashScreenBackground">@color/colorPrimary</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
         <item name="postSplashScreenTheme">@style/Theme.Snoozeloo</item>
+        <item name="android:actionBarTheme">@style/Theme.Snoozeloo</item>
     </style>
 </resources>
