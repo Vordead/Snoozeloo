@@ -3,13 +3,15 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_list
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AddAlarmFab
@@ -40,7 +42,18 @@ fun AlarmListScreen(
                     .statusBarsPadding()
                     .consumeWindowInsets(paddingValues)
             ) {
-                AppBar(title = "Your Alarms")
+                AppBar(
+                    title = "Your Alarms",
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .shadow(
+                            elevation = 10.dp,
+                            spotColor = Color(0xFFF6F6F6),
+                            clip = true,
+                            ambientColor = Color(0xFFF6F6F6),
+                            shape = CircleShape
+                        )
+                )
                 AlarmList(
                     alarms = state.alarms,
                     onAlarmClick = { alarm ->

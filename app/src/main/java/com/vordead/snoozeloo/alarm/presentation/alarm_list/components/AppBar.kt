@@ -11,10 +11,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AppBar(title : String) {
+fun AppBar(title : String, modifier: Modifier = Modifier) {
     Text(
         text = title,
-        modifier = Modifier
+        modifier = modifier
             .padding(start = 16.dp, end = 16.dp, top = 16.dp),
         style = MaterialTheme.typography.bodyLarge.copy(
             fontSize = 24.sp,
