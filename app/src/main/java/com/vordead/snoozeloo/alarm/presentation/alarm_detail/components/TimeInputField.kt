@@ -58,7 +58,7 @@ fun TimeInputField(
     BasicTextField(
         state = state ,
         modifier = modifier,
-        inputTransformation = DigitsOnlyTransformation,
+        inputTransformation = TwoDigitsOnlyTransformation,
         textStyle = LocalTextStyle.current.copy(fontSize = 20.sp),
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         lineLimits = TextFieldLineLimits.SingleLine,
@@ -75,7 +75,7 @@ fun TimeInputField(
     )
 }
 
-object DigitsOnlyTransformation : InputTransformation {
+object TwoDigitsOnlyTransformation : InputTransformation {
     @OptIn(ExperimentalFoundationApi::class)
     override fun TextFieldBuffer.transformInput() {
         if(asCharSequence().length > 2) {
