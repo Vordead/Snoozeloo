@@ -1,31 +1,52 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_detail
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmDetailAppBar
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmTimeInput
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlarmDetailDialog(
     modifier: Modifier = Modifier,
     alarmId: String? = null,
 ) {
-    Column(modifier = modifier) {
-        AlarmDetailAppBar(
-            onBackClick = {},
-            onSaveClick = {},
-            modifier = Modifier
-        )
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar({
+            AlarmDetailAppBar(
+                onBackClick = {},
+                onSaveClick = {},
+                modifier = Modifier
+            )
+        })
+
+    }) { innerPadding ->
+        Column(
+            modifier = modifier
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+        ) {
+
+            AlarmTimeInput { _, _ -> }
+        }
     }
+
 }
 
 @Preview
 @Composable
 private fun AlarmDetailDialogPreview() {
     SnoozelooBackground {
-        AlarmDetailDialog(alarmId = "1")
+        AlarmDetailDialog(alarmId = "1", modifier = Modifier.systemBarsPadding())
     }
 }
