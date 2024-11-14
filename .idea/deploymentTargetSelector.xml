@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-12T17:44:05.079282Z">
+        <DropdownSelection timestamp="2024-11-14T16:37:02.959452Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/Users/mohamadhamade/.android/avd/Pixel_9_Pro_API_35.avd" />
@@ -13,21 +13,13 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="AlarmListItemPreview">
+      <SelectionState runConfigName="TimeInputFieldPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="AlarmDetailAppBarPreview">
+      <SelectionState runConfigName="AlarmTimeInputPreview">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-13T20:18:45.453191Z">
-          <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/mohamadhamade/.android/avd/Pixel_9_Pro_API_35.avd" />
-            </handle>
-          </Target>
-        </DropdownSelection>
-        <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="LandingPreview">
+      <SelectionState runConfigName="AlarmDetailDialogPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
