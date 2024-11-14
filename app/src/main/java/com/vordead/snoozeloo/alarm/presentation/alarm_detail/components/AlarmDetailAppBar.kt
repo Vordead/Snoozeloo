@@ -48,7 +48,7 @@ fun AlarmDetailAppBar(
 
         FilledTonalButton(
             onSaveClick,
-            colors = ButtonDefaults.filledTonalButtonColors(containerColor = Color(0xFF4664FF)),
+            colors = ButtonDefaults.filledTonalButtonColors(containerColor = Color(0xFF4664FF), contentColor = Color.White),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
         ) {
             Text(
