@@ -37,7 +37,9 @@ fun AlarmListScreen(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             AddAlarmFab(
-                onClick = { AlarmListAction.onCreateAlarmClick },
+                onClick = {
+                    onAction(AlarmListAction.onCreateAlarmClick)
+                },
                 modifier = Modifier
                     .padding(bottom = 20.dp)
             )
@@ -118,9 +120,7 @@ fun LandingHeader() {
                     end = Offset(0.0f, 100.0f)
                 )
             )
-    ) {
-        // Your content here
-    }
+    )
 }
 
 @Preview
