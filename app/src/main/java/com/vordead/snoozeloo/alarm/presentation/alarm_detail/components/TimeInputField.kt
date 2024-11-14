@@ -2,10 +2,11 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,18 +18,25 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.forEachChange
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vordead.snoozeloo.R
 import com.vordead.snoozeloo.ui.theme.SnoozelooTheme
 
 
@@ -37,14 +45,37 @@ fun AlarmTimeInput(
     modifier: Modifier = Modifier,
     onTimeChange: (String, String) -> Unit
 ) {
-    var hour by remember { mutableStateOf("") }
-    var minute by remember { mutableStateOf("") }
+    val hourTextInputState = rememberTextFieldState("00")
+    val minuteTextInputState = rememberTextFieldState("00")
+    val focus = LocalFocusManager.current
 
-    Row(
+    Card(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TimeInputField(
+                state = hourTextInputState,
+                modifier = Modifier
+            )
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_colon) ,
+                contentDescription = "Colon",
+                tint = Color(0xFF858585),
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+            TimeInputField(
+                state = minuteTextInputState,
+                modifier = Modifier
+            )
+        }
     }
 }
 
@@ -52,33 +83,45 @@ fun AlarmTimeInput(
 @Composable
 fun TimeInputField(
     state: TextFieldState,
-    placeholder: String,
     modifier: Modifier = Modifier
 ) {
     BasicTextField(
-        state = state ,
+        state = state,
         modifier = modifier,
         inputTransformation = TwoDigitsOnlyTransformation,
-        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp),
+        textStyle = MaterialTheme.typography.displayLarge.copy(
+            fontSize = 52.sp,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center,
+            color = Color(0xFF858585)
+        ),
+        cursorBrush = Brush.linearGradient(
+            colors = listOf(
+                Color(0xFF4664FF),
+                Color(0xFF4664FF)
+            )
+        ),
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         lineLimits = TextFieldLineLimits.SingleLine,
         decorator = { innerTextField ->
-            Row(
-                modifier = Modifier
-                    .background(Color.White, RoundedCornerShape(8.dp))
-                    .height(48.dp)
-                    .width(48.dp)
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF6F6F6)),
+                modifier = Modifier.width(128.dp) // Adjust the width as needed
             ) {
-                innerTextField()
+                Box(Modifier.padding(horizontal = 29.dp, vertical = 16.dp)) {
+                    innerTextField()
+                }
             }
         }
     )
+
+
 }
 
 object TwoDigitsOnlyTransformation : InputTransformation {
     @OptIn(ExperimentalFoundationApi::class)
     override fun TextFieldBuffer.transformInput() {
-        if(asCharSequence().length > 2) {
+        if (asCharSequence().length > 2) {
             replace(0, asCharSequence().length, asCharSequence().subSequence(0, 2))
         }
         changes.forEachChange { range, _ ->
@@ -94,8 +137,6 @@ object TwoDigitsOnlyTransformation : InputTransformation {
 }
 
 
-
-
 @Preview
 @Composable
 fun TimeInputFieldPreview() {
@@ -104,7 +145,6 @@ fun TimeInputFieldPreview() {
         TimeInputField(
             modifier = Modifier.systemBarsPadding(),
             state = state,
-            placeholder = "00"
         )
     }
 }
@@ -112,5 +152,5 @@ fun TimeInputFieldPreview() {
 @Preview
 @Composable
 fun AlarmTimeInputPreview() {
-    AlarmTimeInput(onTimeChange = { _, _ -> })
+    AlarmTimeInput(onTimeChange = { _, _ -> }, modifier = Modifier.systemBarsPadding())
 }
