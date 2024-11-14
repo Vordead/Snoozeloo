@@ -78,6 +78,9 @@ fun TimeInputField(
 object DigitsOnlyTransformation : InputTransformation {
     @OptIn(ExperimentalFoundationApi::class)
     override fun TextFieldBuffer.transformInput() {
+        if(asCharSequence().length > 2) {
+            replace(0, asCharSequence().length, asCharSequence().subSequence(0, 2))
+        }
         changes.forEachChange { range, _ ->
             Log.d("DigitsOnlyTransformation", changes.toString())
             if (!range.collapsed) {
