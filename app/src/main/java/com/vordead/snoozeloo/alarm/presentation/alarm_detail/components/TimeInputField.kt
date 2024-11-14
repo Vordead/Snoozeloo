@@ -26,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.substring
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,11 +80,10 @@ object DigitsOnlyTransformation : InputTransformation {
     override fun TextFieldBuffer.transformInput() {
         changes.forEachChange { range, _ ->
             Log.d("DigitsOnlyTransformation", changes.toString())
-            val ss = asCharSequence().substring(range)
             if (!range.collapsed) {
-                val newText = ss.filter { it.isDigit() }.trimEnd()
-                if (newText != ss) {
-                    replace(range.min, range.max, newText)
+                val charInput = asCharSequence()[range.min]
+                if (!charInput.isDigit()) {
+                    replace(range.min, range.max, "")
                 }
             }
         }
