@@ -73,7 +73,6 @@ fun AlarmTimeInput(
 ) {
     val hourTextInputState = rememberTextFieldState("00")
     val minuteTextInputState = rememberTextFieldState("00")
-    val focus = LocalFocusManager.current
 
     Card(
         modifier = modifier,
@@ -122,16 +121,23 @@ fun TimeInputField(
     val isFocused = interactionSource.collectIsFocusedAsState().value
 
     LaunchedEffect(isFocused) {
-        if (isFocused && state.text == "00") {
-            state.clearText()
-        }
-        if(!isFocused && state.text == "0") {
-            state.edit {
-                replace(0, 1, "00")
+        when {
+            isFocused && state.text == "00" -> {
+                state.clearText()
+            }
+            !isFocused && state.text.length == 1 -> {
+                state.edit {
+                    replace(0, 1, "0${state.text}")
+                }
+            }
+            !isFocused && state.text == "0" -> {
+                state.edit {
+                    replace(0, 1, "00")
+                }
             }
         }
-
     }
+
 
     BasicTextField(
         state = state,
@@ -159,12 +165,10 @@ fun TimeInputField(
             }
             when (keyboardOptions.imeAction) {
                 ImeAction.Next -> {
-                    // Move to the next input field
                     focus.moveFocus(FocusDirection.Next)
                 }
 
                 ImeAction.Done -> {
-                    // Complete the input
                     focus.clearFocus()
                 }
 
@@ -175,7 +179,7 @@ fun TimeInputField(
         decorator = { innerTextField ->
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF6F6F6)),
-                modifier = Modifier.width(128.dp) // Adjust the width as needed
+                modifier = Modifier.width(128.dp)
             ) {
                 Box(Modifier.padding(horizontal = 29.dp, vertical = 16.dp)) {
                     innerTextField()
@@ -201,6 +205,10 @@ object HourInputTransformation : InputTransformation {
                     replace(range.min, range.max, "")
                 }
             }
+            val inputText = asCharSequence().toString()
+            if (inputText.isNotEmpty() && inputText.toInt() > 23) {
+                revertAllChanges()
+            }
         }
     }
 }
@@ -212,19 +220,17 @@ object MinuteInputTransformation : InputTransformation {
     @OptIn(ExperimentalFoundationApi::class)
     override fun TextFieldBuffer.transformInput() {
         placeCursorAtEnd()
-        if (asCharSequence().length > 2) {
-            replace(0, asCharSequence().length, asCharSequence().subSequence(0, 2))
-        }
         changes.forEachChange { range, _ ->
             Log.d("DigitsOnlyTransformation", changes.toString())
             if (!range.collapsed) {
                 val charInput = asCharSequence()[range.min]
                 if (!charInput.isDigit()) {
                     replace(range.min, range.max, "")
-//                    placeCursorAfterCharAt()
-//                    placeCursorAtEnd()
-//                    placeCursorBeforeCharAt()
                 }
+            }
+            val inputText = asCharSequence().toString()
+            if (inputText.isNotEmpty() && inputText.toInt() > 59) {
+                revertAllChanges()
             }
         }
     }
