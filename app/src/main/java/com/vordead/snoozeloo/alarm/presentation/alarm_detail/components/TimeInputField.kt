@@ -2,8 +2,6 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +19,6 @@ import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.allCaps
-import androidx.compose.foundation.text.input.byValue
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.forEachChange
 import androidx.compose.foundation.text.input.maxLength
@@ -33,9 +29,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,11 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.clearTextSubstitution
-import androidx.compose.ui.semantics.maxTextLength
-import androidx.compose.ui.semantics.text
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -59,11 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vordead.snoozeloo.R
 import com.vordead.snoozeloo.ui.theme.SnoozelooTheme
-import kotlin.compareTo
-import kotlin.text.get
-import kotlin.text.replace
-import kotlin.text.subSequence
-import kotlin.toString
 
 
 @Composable
@@ -88,7 +74,7 @@ fun AlarmTimeInput(
         ) {
             TimeInputField(
                 state = hourTextInputState,
-                inputTransformation = HourInputTransformation,
+                inputTransformation = InputTransformation.hourInput(),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             )
             Icon(
@@ -99,7 +85,7 @@ fun AlarmTimeInput(
             )
             TimeInputField(
                 state = minuteTextInputState,
-                inputTransformation = MinuteInputTransformation,
+                inputTransformation = InputTransformation.minuteInput(),
                 modifier = Modifier
             )
         }
@@ -125,11 +111,13 @@ fun TimeInputField(
             isFocused && state.text == "00" -> {
                 state.clearText()
             }
+
             !isFocused && state.text.length == 1 -> {
                 state.edit {
                     replace(0, 1, "0${state.text}")
                 }
             }
+
             !isFocused && state.text == "0" -> {
                 state.edit {
                     replace(0, 1, "00")
@@ -137,7 +125,6 @@ fun TimeInputField(
             }
         }
     }
-
 
     BasicTextField(
         state = state,
@@ -189,11 +176,22 @@ fun TimeInputField(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Stable
+fun InputTransformation.limitedInput(maxValue: Int): InputTransformation =
+    this.then(MaxValueDigitInputTransformation(maxValue))
 
-object HourInputTransformation : InputTransformation {
+
+@Stable
+fun InputTransformation.hourInput(): InputTransformation = limitedInput(23)
+
+@Stable
+fun InputTransformation.minuteInput(): InputTransformation = limitedInput(59)
+
+
+data class MaxValueDigitInputTransformation(val maxValue: Int) : InputTransformation {
     override val keyboardOptions: KeyboardOptions?
         get() = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-
     @OptIn(ExperimentalFoundationApi::class)
     override fun TextFieldBuffer.transformInput() {
         placeCursorAtEnd()
@@ -206,52 +204,8 @@ object HourInputTransformation : InputTransformation {
                 }
             }
             val inputText = asCharSequence().toString()
-            if (inputText.isNotEmpty() && inputText.toInt() > 23) {
+            if (inputText.isNotEmpty() && inputText.toInt() > maxValue) {
                 revertAllChanges()
-            }
-        }
-    }
-}
-
-object MinuteInputTransformation : InputTransformation {
-    override val keyboardOptions: KeyboardOptions?
-        get() = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-
-    @OptIn(ExperimentalFoundationApi::class)
-    override fun TextFieldBuffer.transformInput() {
-        placeCursorAtEnd()
-        changes.forEachChange { range, _ ->
-            Log.d("DigitsOnlyTransformation", changes.toString())
-            if (!range.collapsed) {
-                val charInput = asCharSequence()[range.min]
-                if (!charInput.isDigit()) {
-                    replace(range.min, range.max, "")
-                }
-            }
-            val inputText = asCharSequence().toString()
-            if (inputText.isNotEmpty() && inputText.toInt() > 59) {
-                revertAllChanges()
-            }
-        }
-    }
-}
-
-object TwoDigitsOnlyTransformation : InputTransformation {
-    @OptIn(ExperimentalFoundationApi::class)
-    override fun TextFieldBuffer.transformInput() {
-        if (asCharSequence().length > 2) {
-            replace(0, asCharSequence().length, asCharSequence().subSequence(0, 2))
-        }
-        changes.forEachChange { range, _ ->
-            Log.d("DigitsOnlyTransformation", changes.toString())
-            if (!range.collapsed) {
-                val charInput = asCharSequence()[range.min]
-                if (!charInput.isDigit()) {
-                    replace(range.min, range.max, "")
-//                    placeCursorAfterCharAt()
-//                    placeCursorAtEnd()
-//                    placeCursorBeforeCharAt()
-                }
             }
         }
     }
@@ -265,7 +219,7 @@ fun TimeInputFieldPreview() {
     SnoozelooTheme {
         TimeInputField(
             modifier = Modifier.systemBarsPadding(),
-            inputTransformation = TwoDigitsOnlyTransformation,
+            inputTransformation = InputTransformation.hourInput(),
             state = state,
         )
     }
