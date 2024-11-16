@@ -5,5 +5,6 @@ import androidx.compose.runtime.Immutable
 @Immutable
 data class AlarmDetailState(
     val alarmId: String? = null,
-    val alarmName: String? = null
+    val alarmName: String = "",
+    val showAlarmNameDialog: Boolean = false,
 )
