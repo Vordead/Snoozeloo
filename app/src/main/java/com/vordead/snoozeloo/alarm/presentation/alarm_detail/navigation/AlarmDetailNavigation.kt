@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
+import androidx.navigation.toRoute
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailDialog
 import kotlinx.serialization.Serializable
 
@@ -15,7 +16,7 @@ fun NavController.navigateToAlarmDetail(id: String) = navigate(AlarmDetail(id))
 
 fun NavGraphBuilder.alarmDetailDestination(){
     composable<AlarmDetail> { backStackEntry ->
-        val alarmId = backStackEntry.arguments?.getString("id")
-        AlarmDetailDialog(alarmId = alarmId)
+        val args = backStackEntry.toRoute<AlarmDetail>()
+        AlarmDetailDialog(alarmId = args.id)
     }
 }
