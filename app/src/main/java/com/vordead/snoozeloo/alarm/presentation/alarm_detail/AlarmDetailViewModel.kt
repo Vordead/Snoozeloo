@@ -9,11 +9,15 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class AlarmDetailViewModel @Inject constructor(): ViewModel() {
+class AlarmDetailViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(AlarmDetailState())
     val uiState = _uiState.stateIn(
         viewModelScope,
         initialValue = AlarmDetailState(),
         started = SharingStarted.WhileSubscribed(5_000)
     )
+
+
+
+
 }
