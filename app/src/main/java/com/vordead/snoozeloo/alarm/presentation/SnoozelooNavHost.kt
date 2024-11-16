@@ -20,6 +20,13 @@ fun SnoozelooNavHost(modifier: Modifier = Modifier) {
         alarmListDestination(onNavigateToAlarmDetail = { alarmId ->
             navController.navigateToAlarmDetail(alarmId)
         })
-        alarmDetailDestination()
+        alarmDetailDestination(
+            onNavigateBack = {
+                navController.navigateUp()
+            },
+            onNavigateToAlarmDialog = {
+
+            }
+        )
     }
 }
