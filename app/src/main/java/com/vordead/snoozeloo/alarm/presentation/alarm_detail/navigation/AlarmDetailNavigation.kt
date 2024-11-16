@@ -39,21 +39,28 @@ fun NavGraphBuilder.alarmDetailDestination(
             state = uiState.value,
             onAction = {
                 when (it) {
-                    is AlarmDetailAction.onSaveClick -> {
+                    is AlarmDetailAction.OnSaveClick -> {
                         onNavigateBack()
                     }
 
-                    is AlarmDetailAction.onBackClick -> {
+                    is AlarmDetailAction.OnBackClick -> {
                         onNavigateBack()
                     }
 
-                    is AlarmDetailAction.onAlarmNameClick -> {
-                        // Handle alarm name click
+                    is AlarmDetailAction.OnAlarmNameClick -> {
+                        vm.showAlarmDialog(true)
                     }
 
-                    is AlarmDetailAction.onTimeChange -> {
+                    is AlarmDetailAction.OnTimeChange -> {
                         // Handle time change
                     }
+
+                    is AlarmDetailAction.OnSaveAlarmName -> {
+                        vm.onAlarmNameChange(it.alarmName ?: "")
+                    }
+
+                    AlarmDetailAction.OnDismissAlarmNameDialog -> {
+                        vm.showAlarmDialog(false)                    }
                 }
             }
         )
