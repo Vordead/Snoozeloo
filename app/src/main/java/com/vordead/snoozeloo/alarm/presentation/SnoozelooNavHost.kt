@@ -24,7 +24,7 @@ fun SnoozelooNavHost(modifier: Modifier = Modifier) {
             onNavigateBack = {
                 navController.navigateUp()
             },
-            onNavigateToAlarmDialog = {
+            onNavigateToRingtoneSettings = {
 
             }
         )

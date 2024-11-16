@@ -25,7 +25,7 @@ fun NavGraphBuilder.alarmListDestination(
                 when(it) {
                     is AlarmListAction.onAlarmSwitchClick -> alarmListViewModel.onAlarmSwitchClick(it.alarmId, it.isChecked)
                     AlarmListAction.onCreateAlarmClick -> onNavigateToAlarmDetail("")
-                    is AlarmListAction.onAlarmClick -> TODO()
+                    is AlarmListAction.onAlarmClick -> onNavigateToAlarmDetail(it.alarmId)
                 }
             }
         )

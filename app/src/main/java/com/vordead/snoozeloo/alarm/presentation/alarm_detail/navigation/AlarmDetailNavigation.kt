@@ -21,7 +21,7 @@ fun NavController.navigateToAlarmDetail(id: String) = navigate(AlarmDetail(id))
 
 fun NavGraphBuilder.alarmDetailDestination(
     onNavigateBack: () -> Unit,
-    onNavigateToAlarmDialog : () -> Unit,
+    onNavigateToRingtoneSettings : () -> Unit,
 ) {
     composable<AlarmDetail>(
         enterTransition = {
