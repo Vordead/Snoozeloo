@@ -1,5 +1,6 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components
 
+import android.R.attr.textStyle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
@@ -36,16 +38,18 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.hourInput
 import com.vordead.snoozeloo.ui.theme.SnoozelooTheme
-
 
 @OptIn(
     ExperimentalFoundationApi::class,
@@ -58,13 +62,23 @@ fun TimeInputField(
     inputTransformation: InputTransformation,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+    textStyle: TextStyle = MaterialTheme.typography.displayLarge.copy(
+        fontSize = 52.sp,
+        fontWeight = FontWeight.Medium,
+        textAlign = TextAlign.Center,
+        color = Color(0xFF4664FF)
+    ),
+    focusedBorderColor: Color = Color.Blue,
+    unfocusedBorderColor: Color = Color.Gray,
+    focusedBorderWidth: Dp = 2.dp,
+    unfocusedBorderWidth: Dp? = null,
+    shape: Shape = RoundedCornerShape(10.dp)
 ) {
-
     val isImeVisible = WindowInsets.isImeVisible
     val focus = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused = interactionSource.collectIsFocusedAsState().value
-    val textSize by animateFloatAsState(targetValue = if (isFocused) 56f else 52f)
+    val textSize by animateFloatAsState(targetValue = if (isFocused) textStyle.fontSize.value + 4 else textStyle.fontSize.value)
 
     LaunchedEffect(isFocused) {
         calibrateTextField(state, isFocused)
@@ -81,12 +95,7 @@ fun TimeInputField(
         modifier = modifier,
         interactionSource = interactionSource,
         inputTransformation = inputTransformation,
-        textStyle = MaterialTheme.typography.displayLarge.copy(
-            fontSize = textSize.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            color = Color(0xFF4664FF)
-        ),
+        textStyle = textStyle.copy(fontSize = textSize.sp),
         cursorBrush = Brush.linearGradient(
             colors = listOf(
                 Color(0xFF4664FF),
@@ -100,9 +109,10 @@ fun TimeInputField(
         lineLimits = TextFieldLineLimits.SingleLine,
         decorator = { innerTextField ->
             Card(
-                border = if (isFocused) BorderStroke(1.dp, Color(0xFF4664FF)) else null,
+                border = if (isFocused) BorderStroke(focusedBorderWidth, focusedBorderColor) else unfocusedBorderWidth?.let { BorderStroke(it, unfocusedBorderColor) },
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF6F6F6)),
-                modifier = Modifier.width(128.dp)
+                shape = shape,
+                modifier = Modifier.width((textSize * 2.5).dp)
             ) {
                 Box(
                     Modifier
@@ -110,7 +120,11 @@ fun TimeInputField(
                         .fillMaxWidth()
                 ) {
                     if (state.text.isBlank()) {
-                        decoratedPlaceholder?.invoke(Modifier.align(Alignment.Center))
+                        Text(
+                            text = "00",
+                            style = textStyle.copy(fontSize = textSize.sp, color = Color(0xFF858585)),
+                            modifier = Modifier.align(Alignment.Center)
+                        )
                     } else innerTextField()
                 }
             }
@@ -157,21 +171,6 @@ private fun handleKeyboardAction(
         else -> performDefaultAction()
     }
 }
-
-private val decoratedPlaceholder: @Composable ((Modifier) -> Unit)? =
-    @Composable { modifier ->
-        Box(modifier) {
-            Text(
-                text = "00",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontSize = 52.sp,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                    color = Color(0xFF858585)
-                )
-            )
-        }
-    }
 
 @Preview
 @Composable
