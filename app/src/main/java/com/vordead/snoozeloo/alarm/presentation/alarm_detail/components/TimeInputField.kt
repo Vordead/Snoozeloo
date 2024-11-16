@@ -1,5 +1,6 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -98,7 +99,7 @@ fun TimeInputField(
             fontSize = 52.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
-            color = Color(0xFF858585)
+            color = Color(0xFF4664FF)
         ),
         cursorBrush = Brush.linearGradient(
             colors = listOf(
@@ -128,6 +129,7 @@ fun TimeInputField(
         lineLimits = TextFieldLineLimits.SingleLine,
         decorator = { innerTextField ->
             Card(
+                border =  if(isFocused) BorderStroke(1.dp, Color(0xFF4664FF)) else null,
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF6F6F6)),
                 modifier = Modifier.width(128.dp)
             ) {
