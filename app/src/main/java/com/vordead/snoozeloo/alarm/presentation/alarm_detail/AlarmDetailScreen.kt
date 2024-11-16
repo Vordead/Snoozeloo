@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmDetailAppBar
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmFieldChangeDialog
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmSetting
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmTimeInput
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
@@ -27,12 +28,22 @@ fun AlarmDetailScreen(
     state: AlarmDetailState,
     onAction: (AlarmDetailAction) -> Unit,
 ) {
+    if(state.showAlarmNameDialog){
+        AlarmFieldChangeDialog(
+            onSaveClicked = { onAction(AlarmDetailAction.OnSaveAlarmName(it)) },
+            fieldText = state.alarmName,
+            onDismiss = {
+                onAction(AlarmDetailAction.OnDismissAlarmNameDialog)
+            },
+            modifier = Modifier.systemBarsPadding()
+        )
+    }
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
             title = {
                 AlarmDetailAppBar(
-                    onBackClick = {onAction(AlarmDetailAction.onBackClick)},
-                    onSaveClick = {onAction(AlarmDetailAction.onSaveClick)},
+                    onBackClick = {onAction(AlarmDetailAction.OnBackClick)},
+                    onSaveClick = {onAction(AlarmDetailAction.OnSaveClick)},
                     modifier = Modifier
                 )
             },
@@ -54,7 +65,7 @@ fun AlarmDetailScreen(
             AlarmSetting(
                 title = "Alarm Name",
                 onClick = {
-
+                    onAction(AlarmDetailAction.OnAlarmNameClick)
                 },
                 trailingContent = {
                     Text("Work", style = MaterialTheme.typography.bodyMedium)
