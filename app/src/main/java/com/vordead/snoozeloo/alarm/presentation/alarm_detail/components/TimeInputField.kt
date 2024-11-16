@@ -1,11 +1,15 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
@@ -13,7 +17,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.KeyboardActionHandler
-import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
@@ -23,9 +26,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,23 +44,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.hourInput
 import com.vordead.snoozeloo.ui.theme.SnoozelooTheme
+
 val decoratedPlaceholder: @Composable ((Modifier) -> Unit)? =
-    if (true) {
-        @Composable { modifier ->
-            Box(modifier) {
-                Text(
-                    text = "00",
-                    style = MaterialTheme.typography.displayLarge.copy(
-                        fontSize = 52.sp,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center,
-                        color = Color(0xFF858585)
-                    )
+    @Composable { modifier ->
+        Box(modifier) {
+            Text(
+                text = "00",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontSize = 52.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF858585)
                 )
-            }
+            )
         }
-    } else null
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+    }
+
+@OptIn(
+    ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalLayoutApi::class
+)
 @Composable
 fun TimeInputField(
     state: TextFieldState,
@@ -66,9 +73,12 @@ fun TimeInputField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
 ) {
 
+    val isImeVisible = WindowInsets.isImeVisible
     val focus = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused = interactionSource.collectIsFocusedAsState().value
+    val textSize by animateFloatAsState(targetValue = if (isFocused) 56f else 52f)
+
 
     LaunchedEffect(isFocused) {
         when {
@@ -90,13 +100,19 @@ fun TimeInputField(
         }
     }
 
+    LaunchedEffect(isImeVisible) {
+        if (isImeVisible.not()) {
+            focus.clearFocus()
+        }
+    }
+
     BasicTextField(
         state = state,
         modifier = modifier,
         interactionSource = interactionSource,
         inputTransformation = inputTransformation,
         textStyle = MaterialTheme.typography.displayLarge.copy(
-            fontSize = 52.sp,
+            fontSize = textSize.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             color = Color(0xFF4664FF)
@@ -129,15 +145,18 @@ fun TimeInputField(
         lineLimits = TextFieldLineLimits.SingleLine,
         decorator = { innerTextField ->
             Card(
-                border =  if(isFocused) BorderStroke(1.dp, Color(0xFF4664FF)) else null,
+                border = if (isFocused) BorderStroke(1.dp, Color(0xFF4664FF)) else null,
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF6F6F6)),
                 modifier = Modifier.width(128.dp)
             ) {
-                Box(Modifier.padding(horizontal = 29.dp, vertical = 16.dp).fillMaxWidth()) {
-                    if(state.text.isBlank()){
+                Box(
+                    Modifier
+                        .padding(horizontal = 29.dp, vertical = 16.dp)
+                        .fillMaxWidth()
+                ) {
+                    if (state.text.isBlank()) {
                         decoratedPlaceholder?.invoke(Modifier.align(Alignment.Center))
-                    }
-                    else innerTextField()
+                    } else innerTextField()
                 }
             }
         }
