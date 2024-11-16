@@ -1,6 +1,5 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components
 
-import android.R.attr.textStyle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -62,17 +61,12 @@ fun TimeInputField(
     inputTransformation: InputTransformation,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-    textStyle: TextStyle = MaterialTheme.typography.displayLarge.copy(
-        fontSize = 52.sp,
-        fontWeight = FontWeight.Medium,
-        textAlign = TextAlign.Center,
-        color = Color(0xFF4664FF)
-    ),
-    focusedBorderColor: Color = Color.Blue,
-    unfocusedBorderColor: Color = Color.Gray,
-    focusedBorderWidth: Dp = 2.dp,
-    unfocusedBorderWidth: Dp? = null,
-    shape: Shape = RoundedCornerShape(10.dp)
+    textStyle: TextStyle = TimeInputFieldDefaults.textStyle.copy(fontFamily = MaterialTheme.typography.displayLarge.fontFamily),
+    focusedBorderColor: Color = TimeInputFieldDefaults.focusedBorderColor,
+    unfocusedBorderColor: Color = TimeInputFieldDefaults.unfocusedBorderColor,
+    focusedBorderWidth: Dp = TimeInputFieldDefaults.focusedBorderWidth,
+    unfocusedBorderWidth: Dp? = TimeInputFieldDefaults.unfocusedBorderWidth,
+    shape: Shape = TimeInputFieldDefaults.shape
 ) {
     val isImeVisible = WindowInsets.isImeVisible
     val focus = LocalFocusManager.current
@@ -109,7 +103,10 @@ fun TimeInputField(
         lineLimits = TextFieldLineLimits.SingleLine,
         decorator = { innerTextField ->
             Card(
-                border = if (isFocused) BorderStroke(focusedBorderWidth, focusedBorderColor) else unfocusedBorderWidth?.let { BorderStroke(it, unfocusedBorderColor) },
+                border = if (isFocused) BorderStroke(
+                    focusedBorderWidth,
+                    focusedBorderColor
+                ) else unfocusedBorderWidth?.let { BorderStroke(it, unfocusedBorderColor) },
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF6F6F6)),
                 shape = shape,
                 modifier = Modifier.width((textSize * 2.5).dp)
@@ -122,7 +119,10 @@ fun TimeInputField(
                     if (state.text.isBlank()) {
                         Text(
                             text = "00",
-                            style = textStyle.copy(fontSize = textSize.sp, color = Color(0xFF858585)),
+                            style = textStyle.copy(
+                                fontSize = textSize.sp,
+                                color = Color(0xFF858585)
+                            ),
                             modifier = Modifier.align(Alignment.Center)
                         )
                     } else innerTextField()
@@ -137,11 +137,13 @@ private fun calibrateTextField(state: TextFieldState, isFocused: Boolean) {
         isFocused && state.text == "00" -> {
             state.clearText()
         }
+
         !isFocused && state.text.length == 1 -> {
             state.edit {
                 replace(0, 1, "0${state.text}")
             }
         }
+
         !isFocused && state.text == "0" -> {
             state.edit {
                 replace(0, 1, "00")
@@ -165,11 +167,27 @@ private fun handleKeyboardAction(
         ImeAction.Next -> {
             focus.moveFocus(FocusDirection.Next)
         }
+
         ImeAction.Done -> {
             focus.clearFocus()
         }
+
         else -> performDefaultAction()
     }
+}
+
+object TimeInputFieldDefaults {
+    val textStyle: TextStyle = TextStyle(
+        fontSize = 52.sp,
+        fontWeight = FontWeight.Medium,
+        textAlign = TextAlign.Center,
+        color = Color(0xFF4664FF)
+    )
+    val focusedBorderColor: Color = Color.Blue
+    val unfocusedBorderColor: Color = Color.Gray
+    val focusedBorderWidth: Dp = 2.dp
+    val unfocusedBorderWidth: Dp? = null
+    val shape: Shape = RoundedCornerShape(10.dp)
 }
 
 @Preview
