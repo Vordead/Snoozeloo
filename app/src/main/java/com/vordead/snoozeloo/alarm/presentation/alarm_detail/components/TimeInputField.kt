@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -45,20 +46,6 @@ import androidx.compose.ui.unit.sp
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.hourInput
 import com.vordead.snoozeloo.ui.theme.SnoozelooTheme
 
-val decoratedPlaceholder: @Composable ((Modifier) -> Unit)? =
-    @Composable { modifier ->
-        Box(modifier) {
-            Text(
-                text = "00",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontSize = 52.sp,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                    color = Color(0xFF858585)
-                )
-            )
-        }
-    }
 
 @OptIn(
     ExperimentalFoundationApi::class,
@@ -79,25 +66,8 @@ fun TimeInputField(
     val isFocused = interactionSource.collectIsFocusedAsState().value
     val textSize by animateFloatAsState(targetValue = if (isFocused) 56f else 52f)
 
-
     LaunchedEffect(isFocused) {
-        when {
-            isFocused && state.text == "00" -> {
-                state.clearText()
-            }
-
-            !isFocused && state.text.length == 1 -> {
-                state.edit {
-                    replace(0, 1, "0${state.text}")
-                }
-            }
-
-            !isFocused && state.text == "0" -> {
-                state.edit {
-                    replace(0, 1, "00")
-                }
-            }
-        }
+        calibrateTextField(state, isFocused)
     }
 
     LaunchedEffect(isImeVisible) {
@@ -125,22 +95,7 @@ fun TimeInputField(
         ),
         keyboardOptions = keyboardOptions,
         onKeyboardAction = KeyboardActionHandler { performDefaultAction ->
-            if (state.text.isEmpty()) {
-                state.edit {
-                    append("00")
-                }
-            }
-            when (keyboardOptions.imeAction) {
-                ImeAction.Next -> {
-                    focus.moveFocus(FocusDirection.Next)
-                }
-
-                ImeAction.Done -> {
-                    focus.clearFocus()
-                }
-
-                else -> performDefaultAction()
-            }
+            handleKeyboardAction(state, keyboardOptions, focus, performDefaultAction)
         },
         lineLimits = TextFieldLineLimits.SingleLine,
         decorator = { innerTextField ->
@@ -162,6 +117,61 @@ fun TimeInputField(
         }
     )
 }
+
+private fun calibrateTextField(state: TextFieldState, isFocused: Boolean) {
+    when {
+        isFocused && state.text == "00" -> {
+            state.clearText()
+        }
+        !isFocused && state.text.length == 1 -> {
+            state.edit {
+                replace(0, 1, "0${state.text}")
+            }
+        }
+        !isFocused && state.text == "0" -> {
+            state.edit {
+                replace(0, 1, "00")
+            }
+        }
+    }
+}
+
+private fun handleKeyboardAction(
+    state: TextFieldState,
+    keyboardOptions: KeyboardOptions,
+    focus: FocusManager,
+    performDefaultAction: () -> Unit
+) {
+    if (state.text.isEmpty()) {
+        state.edit {
+            append("00")
+        }
+    }
+    when (keyboardOptions.imeAction) {
+        ImeAction.Next -> {
+            focus.moveFocus(FocusDirection.Next)
+        }
+        ImeAction.Done -> {
+            focus.clearFocus()
+        }
+        else -> performDefaultAction()
+    }
+}
+
+private val decoratedPlaceholder: @Composable ((Modifier) -> Unit)? =
+    @Composable { modifier ->
+        Box(modifier) {
+            Text(
+                text = "00",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontSize = 52.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF858585)
+                )
+            )
+        }
+    }
 
 @Preview
 @Composable
