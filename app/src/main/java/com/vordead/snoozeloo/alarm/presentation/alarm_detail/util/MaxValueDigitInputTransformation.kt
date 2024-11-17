@@ -29,7 +29,7 @@ fun InputTransformation.minuteInput(): InputTransformation = limitedInput(59)
 
 data class MaxValueDigitInputTransformation(val maxValue: Int) : InputTransformation {
     init {
-        require(maxValue <= 2) { "maxValue must be less than or equal to 2" }
+        require(maxValue in 0..99) { "maxValue must have at most 2 digits" }
     }
 
     override val keyboardOptions: KeyboardOptions?
