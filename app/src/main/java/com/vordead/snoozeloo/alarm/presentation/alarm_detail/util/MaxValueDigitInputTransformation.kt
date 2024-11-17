@@ -6,30 +6,35 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.forEachChange
-import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.placeCursorAtEnd
 import androidx.compose.foundation.text.input.then
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.input.KeyboardType
-import kotlin.text.isDigit
 
 @OptIn(ExperimentalFoundationApi::class)
 @Stable
 fun InputTransformation.limitedInput(maxValue: Int): InputTransformation =
     this.then(MaxValueDigitInputTransformation(maxValue))
-        .then(InputTransformation.maxLength(2))
 
 
 @Stable
-fun InputTransformation.hourInput(): InputTransformation = limitedInput(23)
+fun InputTransformation.hourInput(is24h: Boolean = true): InputTransformation {
+    val maxValue = if (is24h) 23 else 11
+    return limitedInput(maxValue)
+}
 
 @Stable
 fun InputTransformation.minuteInput(): InputTransformation = limitedInput(59)
 
 
 data class MaxValueDigitInputTransformation(val maxValue: Int) : InputTransformation {
+    init {
+        require(maxValue <= 2) { "maxValue must be less than or equal to 2" }
+    }
+
     override val keyboardOptions: KeyboardOptions?
         get() = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+
     @OptIn(ExperimentalFoundationApi::class)
     override fun TextFieldBuffer.transformInput() {
         placeCursorAtEnd()
