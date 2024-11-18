@@ -1,6 +1,5 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_list.components
 
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
