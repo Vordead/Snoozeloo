@@ -3,6 +3,7 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vordead.snoozeloo.alarm.data.local.LocalAlarmDataSource
+import com.vordead.snoozeloo.alarm.presentation.models.toAlarm
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarmUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,6 +44,10 @@ class AlarmListViewModel @Inject constructor(
 
     fun onAlarmSwitchClick(alarmId: String, isChecked: Boolean) {
         viewModelScope.launch {
+            val updatedAlarm = state.value.alarms.find { it.id == alarmId }?.copy(isEnabled = isChecked)
+            if (updatedAlarm != null) {
+                localAlarmDataSource.upsertAlarm(updatedAlarm.toAlarm())
+            }
             _alarmListState.update { currentState ->
                 currentState.copy(
                     alarms = currentState.alarms.map { alarm ->
