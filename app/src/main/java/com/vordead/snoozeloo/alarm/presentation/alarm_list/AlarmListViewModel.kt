@@ -6,10 +6,12 @@ import com.vordead.snoozeloo.alarm.data.local.LocalAlarmDataSource
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarmUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,7 +22,11 @@ class AlarmListViewModel @Inject constructor(
     private val localAlarmDataSource: LocalAlarmDataSource
 ) : ViewModel() {
 
+    private val _alarmListEvents = Channel<AlarmListEvent>()
+    val alarmListEvents = _alarmListEvents.receiveAsFlow()
+
     private val _alarmListState = MutableStateFlow(AlarmListState())
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val state = _alarmListState
         .flatMapLatest {
@@ -51,17 +57,21 @@ class AlarmListViewModel @Inject constructor(
         }
     }
 
-    fun onAction(action: AlarmListAction): Boolean {
-        return when (action) {
-            is AlarmListAction.onAlarmSwitchClick -> {
-                onAlarmSwitchClick(action.alarmId, action.isChecked)
-                false
-            }
-            AlarmListAction.onCreateAlarmClick -> {
-                true
-            }
-            is AlarmListAction.onAlarmClick -> {
-                true
+
+    fun onAction(action: AlarmListAction) {
+        viewModelScope.launch {
+            when (action) {
+                is AlarmListAction.onAlarmSwitchClick -> {
+                    onAlarmSwitchClick(action.alarmId, action.isChecked)
+                }
+
+                AlarmListAction.onCreateAlarmClick -> {
+                    _alarmListEvents.send(AlarmListEvent.NavigateToAlarmDetail(""))
+                }
+
+                is AlarmListAction.onAlarmClick -> {
+                    _alarmListEvents.send(AlarmListEvent.NavigateToAlarmDetail(action.alarmId))
+                }
             }
         }
     }
