@@ -51,4 +51,19 @@ class AlarmListViewModel @Inject constructor(
         }
     }
 
+    fun onAction(action: AlarmListAction): Boolean {
+        return when (action) {
+            is AlarmListAction.onAlarmSwitchClick -> {
+                onAlarmSwitchClick(action.alarmId, action.isChecked)
+                false
+            }
+            AlarmListAction.onCreateAlarmClick -> {
+                true
+            }
+            is AlarmListAction.onAlarmClick -> {
+                true
+            }
+        }
+    }
+
 }

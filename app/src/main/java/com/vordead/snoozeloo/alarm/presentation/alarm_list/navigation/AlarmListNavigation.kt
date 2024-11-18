@@ -21,11 +21,14 @@ fun NavGraphBuilder.alarmListDestination(
         val state by alarmListViewModel.state.collectAsStateWithLifecycle()
         AlarmListScreen(
             state = state,
-            onAction = {
-                when(it) {
-                    is AlarmListAction.onAlarmSwitchClick -> alarmListViewModel.onAlarmSwitchClick(it.alarmId, it.isChecked)
-                    AlarmListAction.onCreateAlarmClick -> onNavigateToAlarmDetail("")
-                    is AlarmListAction.onAlarmClick -> onNavigateToAlarmDetail(it.alarmId)
+            onAction = { action ->
+                val shouldNavigate = alarmListViewModel.onAction(action)
+                if (shouldNavigate) {
+                    when (action) {
+                        AlarmListAction.onCreateAlarmClick -> onNavigateToAlarmDetail("")
+                        is AlarmListAction.onAlarmClick -> onNavigateToAlarmDetail(action.alarmId)
+                        else -> {}
+                    }
                 }
             }
         )

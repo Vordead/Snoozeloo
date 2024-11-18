@@ -21,7 +21,7 @@ fun NavController.navigateToAlarmDetail(id: String) = navigate(AlarmDetail(id))
 
 fun NavGraphBuilder.alarmDetailDestination(
     onNavigateBack: () -> Unit,
-    onNavigateToRingtoneSettings : () -> Unit,
+    onNavigateToRingtoneSettings: () -> Unit,
 ) {
     composable<AlarmDetail>(
         enterTransition = {
@@ -37,30 +37,15 @@ fun NavGraphBuilder.alarmDetailDestination(
         AlarmDetailScreen(
             alarmId = args.id,
             state = uiState.value,
-            onAction = {
-                when (it) {
-                    is AlarmDetailAction.OnSaveClick -> {
-                        onNavigateBack()
+            onAction = { action ->
+                val shouldNavigate = vm.onAction(action)
+                if (shouldNavigate) {
+                    when (action) {
+                        is AlarmDetailAction.OnSaveClick, AlarmDetailAction.OnBackClick -> {
+                            onNavigateBack()
+                        }
+                        else ->{}
                     }
-
-                    is AlarmDetailAction.OnBackClick -> {
-                        onNavigateBack()
-                    }
-
-                    is AlarmDetailAction.OnAlarmNameClick -> {
-                        vm.showAlarmDialog(true)
-                    }
-
-                    is AlarmDetailAction.OnTimeChange -> {
-                        // Handle time change
-                    }
-
-                    is AlarmDetailAction.OnSaveAlarmName -> {
-                        vm.onAlarmNameChange(it.alarmName ?: "")
-                    }
-
-                    AlarmDetailAction.OnDismissAlarmNameDialog -> {
-                        vm.showAlarmDialog(false)                    }
                 }
             }
         )

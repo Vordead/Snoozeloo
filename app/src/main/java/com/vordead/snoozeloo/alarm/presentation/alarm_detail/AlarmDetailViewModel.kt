@@ -66,12 +66,36 @@ class AlarmDetailViewModel @Inject constructor(
 
 
     fun showAlarmDialog(shouldShow: Boolean) {
-        val ss = "hello"
-        val res = Result.success(ss)
-        res.onSuccess { value -> println(value) }
         viewModelScope.launch {
             _uiState.update {
                 it.copy(showAlarmNameDialog = shouldShow)
+            }
+        }
+    }
+
+    fun onAction(action: AlarmDetailAction): Boolean {
+        return when (action) {
+            is AlarmDetailAction.OnAlarmNameClick -> {
+                showAlarmDialog(true)
+                false
+            }
+            AlarmDetailAction.OnBackClick -> {
+                true
+            }
+            AlarmDetailAction.OnDismissAlarmNameDialog -> {
+                showAlarmDialog(false)
+                false
+            }
+            is AlarmDetailAction.OnSaveAlarmName -> {
+                onAlarmNameChange(action.alarmName ?: "")
+                false
+            }
+            AlarmDetailAction.OnSaveClick -> {
+                true
+            }
+            is AlarmDetailAction.OnTimeChange -> {
+                // Handle time change
+                false
             }
         }
     }
