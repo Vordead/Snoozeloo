@@ -28,12 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vordead.snoozeloo.alarm.presentation.models.AlarmListItemUi
+import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 
 @Composable
 fun AlarmListItem(
-    alarmListItemUi: AlarmListItemUi,
+    alarmUi: AlarmUi,
     onAlarmSwitchClick: (Boolean) -> Unit,
     onAlarmClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -50,8 +50,8 @@ fun AlarmListItem(
                 .padding(16.dp),
         ) {
             AlarmHeader(
-                title = alarmListItemUi.title,
-                checked = alarmListItemUi.isEnabled,
+                title = alarmUi.title,
+                checked = alarmUi.isEnabled,
                 onCheckedChange = { onAlarmSwitchClick(it) }
             )
             TimeDisplay(time = "10:00", period = "AM")
@@ -145,7 +145,7 @@ fun AlarmFooter(
 private fun AlarmListItemPreview() {
     SnoozelooBackground {
         AlarmListItem(
-            alarmListItemUi = AlarmListItemUi(
+            alarmUi = AlarmUi(
                 id = "1",
                 title = "Wake Up",
                 time = "10:00",

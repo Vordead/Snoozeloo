@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AddAlarmFab
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AlarmList
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AppBar
-import com.vordead.snoozeloo.alarm.presentation.models.AlarmListItemUi
+import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 
 @Composable
@@ -90,7 +90,7 @@ private fun AlarmListScreenPreview() {
         AlarmListScreen(
             state = AlarmListState(
                 alarms = listOf(
-                    AlarmListItemUi(
+                    AlarmUi(
                         id = "1",
                         title = "Alarm 1",
                         time = "10:00",

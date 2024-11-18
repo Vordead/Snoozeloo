@@ -7,13 +7,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.vordead.snoozeloo.alarm.presentation.models.AlarmListItemUi
+import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 
 @Composable
 fun AlarmList(
-    alarms: List<AlarmListItemUi>,
-    onAlarmClick: (AlarmListItemUi) -> Unit,
-    onAlarmSwitchClick: (AlarmListItemUi, Boolean) -> Unit,
+    alarms: List<AlarmUi>,
+    onAlarmClick: (AlarmUi) -> Unit,
+    onAlarmSwitchClick: (AlarmUi, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -23,7 +23,7 @@ fun AlarmList(
     ) {
         items(alarms) { alarm ->
             AlarmListItem(
-                alarmListItemUi = alarm,
+                alarmUi = alarm,
                 onAlarmClick = {
                     onAlarmClick(alarm)
                 },
