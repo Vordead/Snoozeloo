@@ -6,8 +6,10 @@ import com.vordead.snoozeloo.alarm.data.local.LocalAlarmDataSource
 import com.vordead.snoozeloo.alarm.domain.models.Alarm
 import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,6 +19,11 @@ import javax.inject.Inject
 class AlarmDetailViewModel @Inject constructor(
     private val localAlarmDataSource: LocalAlarmDataSource
 ) : ViewModel() {
+
+    private val _alarmDetailEvents = Channel<AlarmDetailEvent>()
+    val alarmDetailEvents = _alarmDetailEvents.receiveAsFlow()
+
+
     private val _uiState = MutableStateFlow(AlarmDetailState())
     val uiState = _uiState.stateIn(
         viewModelScope,
@@ -73,29 +80,27 @@ class AlarmDetailViewModel @Inject constructor(
         }
     }
 
-    fun onAction(action: AlarmDetailAction): Boolean {
-        return when (action) {
-            is AlarmDetailAction.OnAlarmNameClick -> {
-                showAlarmDialog(true)
-                false
-            }
-            AlarmDetailAction.OnBackClick -> {
-                true
-            }
-            AlarmDetailAction.OnDismissAlarmNameDialog -> {
-                showAlarmDialog(false)
-                false
-            }
-            is AlarmDetailAction.OnSaveAlarmName -> {
-                onAlarmNameChange(action.alarmName ?: "")
-                false
-            }
-            AlarmDetailAction.OnSaveClick -> {
-                true
-            }
-            is AlarmDetailAction.OnTimeChange -> {
-                // Handle time change
-                false
+    fun onAction(action: AlarmDetailAction) {
+        viewModelScope.launch {
+            when (action) {
+                is AlarmDetailAction.OnAlarmNameClick -> {
+                    showAlarmDialog(true)
+                }
+                AlarmDetailAction.OnBackClick -> {
+                    _alarmDetailEvents.send(AlarmDetailEvent.NavigateBack)
+                }
+                AlarmDetailAction.OnDismissAlarmNameDialog -> {
+                    showAlarmDialog(false)
+                }
+                is AlarmDetailAction.OnSaveAlarmName -> {
+                    onAlarmNameChange(action.alarmName ?: "")
+                }
+                AlarmDetailAction.OnSaveClick -> {
+                    _alarmDetailEvents.send(AlarmDetailEvent.NavigateBack)
+                }
+                is AlarmDetailAction.OnTimeChange -> {
+                    // Handle time change
+                }
             }
         }
     }

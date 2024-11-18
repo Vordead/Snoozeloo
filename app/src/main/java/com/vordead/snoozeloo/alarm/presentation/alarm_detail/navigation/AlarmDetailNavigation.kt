@@ -8,9 +8,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.vordead.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailAction
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailEvent
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailScreen
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailViewModel
+import com.vordead.snoozeloo.core.presentation.util.ObserveAsEvents
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -34,20 +35,20 @@ fun NavGraphBuilder.alarmDetailDestination(
         val args = backStackEntry.toRoute<AlarmDetail>()
         val vm: AlarmDetailViewModel = hiltViewModel()
         val uiState = vm.uiState.collectAsStateWithLifecycle()
+
+        ObserveAsEvents(
+            events = vm.alarmDetailEvents,
+            onEvent = { event ->
+                when (event) {
+                    is AlarmDetailEvent.NavigateBack -> onNavigateBack()
+                }
+            }
+        )
+
         AlarmDetailScreen(
             alarmId = args.id,
             state = uiState.value,
-            onAction = { action ->
-                val shouldNavigate = vm.onAction(action)
-                if (shouldNavigate) {
-                    when (action) {
-                        is AlarmDetailAction.OnSaveClick, AlarmDetailAction.OnBackClick -> {
-                            onNavigateBack()
-                        }
-                        else ->{}
-                    }
-                }
-            }
+            onAction = vm::onAction
         )
     }
 }
