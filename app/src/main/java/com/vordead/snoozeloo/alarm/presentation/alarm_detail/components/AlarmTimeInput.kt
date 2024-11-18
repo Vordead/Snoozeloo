@@ -39,14 +39,17 @@ import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.minuteInput
 @Composable
 fun AlarmTimeInput(
     modifier: Modifier = Modifier,
+    hour : String = "",
+    minute : String = "",
     onTimeChange: (String, String) -> Unit
 ) {
-    val hourTextInputState = rememberTextFieldState("")
-    val minuteTextInputState = rememberTextFieldState("")
+    val hourTextInputState = rememberTextFieldState(hour)
+    val minuteTextInputState = rememberTextFieldState(minute)
 
     var shouldShowTimeLeft by remember { mutableStateOf(false) }
 
     LaunchedEffect(hourTextInputState.text, minuteTextInputState.text) {
+        onTimeChange(hourTextInputState.text.toString(), minuteTextInputState.text.toString())
         shouldShowTimeLeft =
             hourTextInputState.text.isNotEmpty() && minuteTextInputState.text.isNotEmpty()
     }

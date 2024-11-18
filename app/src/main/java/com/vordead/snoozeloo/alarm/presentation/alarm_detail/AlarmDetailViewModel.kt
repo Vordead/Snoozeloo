@@ -3,8 +3,8 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vordead.snoozeloo.alarm.data.local.LocalAlarmDataSource
-import com.vordead.snoozeloo.alarm.domain.models.Alarm
 import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
+import com.vordead.snoozeloo.alarm.presentation.models.toAlarm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,26 +31,11 @@ class AlarmDetailViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000)
     )
 
-    init {
-        viewModelScope.launch {
-            createOrUpdateAlarm(
-                AlarmUi(
-                    id = "1",
-                    title = "Alarm",
-                    time = "12:00",
-                    period = "Mon, Tue, Wed, Thu, Fri",
-                    isEnabled = true,
-                    remainingTime = "Remaining time"
-                )
-            )
-        }
-    }
-
     fun onAlarmNameChange(alarmName: String) {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    alarmName = alarmName,
+                    alarm = it.alarm?.copy(title = alarmName),
                     showAlarmNameDialog = false
                 )
             }
@@ -59,15 +44,7 @@ class AlarmDetailViewModel @Inject constructor(
 
     fun createOrUpdateAlarm(alarm: AlarmUi) {
         viewModelScope.launch {
-            localAlarmDataSource.upsertAlarm(
-                Alarm(
-                    id = alarm.id.toInt(),
-                    alarmName = "alarm.title",
-                    time = "alarm.time",
-                    repeatDays = alarm.period.split(", "),
-                    isEnabled = alarm.isEnabled
-                )
-            )
+            localAlarmDataSource.upsertAlarm(alarm.toAlarm())
         }
     }
 
@@ -86,18 +63,24 @@ class AlarmDetailViewModel @Inject constructor(
                 is AlarmDetailAction.OnAlarmNameClick -> {
                     showAlarmDialog(true)
                 }
+
                 AlarmDetailAction.OnBackClick -> {
                     _alarmDetailEvents.send(AlarmDetailEvent.NavigateBack)
                 }
+
                 AlarmDetailAction.OnDismissAlarmNameDialog -> {
                     showAlarmDialog(false)
                 }
+
                 is AlarmDetailAction.OnSaveAlarmName -> {
                     onAlarmNameChange(action.alarmName ?: "")
                 }
+
                 AlarmDetailAction.OnSaveClick -> {
+                    createOrUpdateAlarm(_uiState.value.alarm ?: return@launch)
                     _alarmDetailEvents.send(AlarmDetailEvent.NavigateBack)
                 }
+
                 is AlarmDetailAction.OnTimeChange -> {
                     // Handle time change
                 }

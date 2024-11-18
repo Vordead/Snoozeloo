@@ -4,7 +4,7 @@ import com.vordead.snoozeloo.alarm.domain.models.Alarm
 
 data class AlarmUi(
     val id: String,
-    val title: String,
+    val title: String = "",
     val time: String,
     val period: String,
     val isEnabled: Boolean = false,

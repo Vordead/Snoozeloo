@@ -5,6 +5,6 @@ sealed interface AlarmDetailAction {
     data object OnSaveClick : AlarmDetailAction
     data object OnBackClick : AlarmDetailAction
     data object OnAlarmNameClick : AlarmDetailAction
-    data class OnTimeChange(val hour: Int, val minute: Int) : AlarmDetailAction
+    data class OnTimeChange(val hour: String, val minute: String) : AlarmDetailAction
     data object OnDismissAlarmNameDialog : AlarmDetailAction
 }

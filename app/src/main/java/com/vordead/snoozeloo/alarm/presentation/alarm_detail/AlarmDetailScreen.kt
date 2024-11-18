@@ -28,10 +28,10 @@ fun AlarmDetailScreen(
     state: AlarmDetailState,
     onAction: (AlarmDetailAction) -> Unit,
 ) {
-    if(state.showAlarmNameDialog){
+    if (state.showAlarmNameDialog) {
         AlarmFieldChangeDialog(
             onSaveClicked = { onAction(AlarmDetailAction.OnSaveAlarmName(it)) },
-            fieldText = state.alarmName,
+            fieldText = state.alarm?.title ?: "",
             onDismiss = {
                 onAction(AlarmDetailAction.OnDismissAlarmNameDialog)
             },
@@ -42,8 +42,9 @@ fun AlarmDetailScreen(
         CenterAlignedTopAppBar(
             title = {
                 AlarmDetailAppBar(
-                    onBackClick = {onAction(AlarmDetailAction.OnBackClick)},
-                    onSaveClick = {onAction(AlarmDetailAction.OnSaveClick)},
+                    isAlarmValid = state.isAlarmValid,
+                    onBackClick = { onAction(AlarmDetailAction.OnBackClick) },
+                    onSaveClick = { onAction(AlarmDetailAction.OnSaveClick) },
                     modifier = Modifier
                 )
             },
@@ -53,7 +54,6 @@ fun AlarmDetailScreen(
             )
         )
 
-
     }) { innerPadding ->
         Column(
             modifier = modifier
@@ -61,7 +61,13 @@ fun AlarmDetailScreen(
                 .padding(horizontal = 16.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            AlarmTimeInput { _, _ -> }
+            AlarmTimeInput(
+                hour = state.hourField,
+                minute = state.minuteField,
+                onTimeChange = { hour, minute ->
+                    onAction(AlarmDetailAction.OnTimeChange(hour, minute))
+                }
+            )
             AlarmSetting(
                 title = "Alarm Name",
                 onClick = {
