@@ -1,13 +1,12 @@
 package com.vordead.snoozeloo.alarm.domain
 
-import com.vordead.snoozeloo.alarm.data.local.AlarmEntity
+import com.vordead.snoozeloo.alarm.domain.models.Alarm
 import kotlinx.coroutines.flow.Flow
 
 interface AlarmDataSource {
-    suspend fun insert(alarmEntity: AlarmEntity)
-    suspend fun update(alarmEntity: AlarmEntity)
-    suspend fun delete(alarmEntity: AlarmEntity)
-    suspend fun getAlarmById(id: Int): AlarmEntity?
-    fun getAllAlarms(): Flow<List<AlarmEntity>>
+    suspend fun upsertAlarm(alarm: Alarm)
+    suspend fun delete(alarm: Alarm)
+    suspend fun getAlarmById(id: Int): Alarm?
+    fun getAllAlarms(): Flow<List<Alarm>>
     suspend fun deleteById(id: Int)
 }
