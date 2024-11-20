@@ -3,7 +3,7 @@ package com.vordead.snoozeloo.alarm.presentation.models
 import com.vordead.snoozeloo.alarm.domain.models.Alarm
 
 data class AlarmUi(
-    val id: String,
+    val id: Int? = null,
     val title: String = "",
     val time: String,
     val period: String,
@@ -14,7 +14,7 @@ data class AlarmUi(
 
 fun Alarm.toAlarmUi(): AlarmUi {
     return AlarmUi(
-        id = id.toString(),
+        id = id,
         title = alarmName ?: "Alarm",
         time = time,
         period = repeatDays.joinToString(", "),
@@ -25,7 +25,7 @@ fun Alarm.toAlarmUi(): AlarmUi {
 
 fun AlarmUi.toAlarm(): Alarm {
     return Alarm(
-        id = id.toInt(),
+        id = id,
         alarmName = title,
         time = time,
         repeatDays = period.split(", "),

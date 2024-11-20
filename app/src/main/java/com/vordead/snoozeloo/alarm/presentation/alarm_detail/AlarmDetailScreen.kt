@@ -24,7 +24,7 @@ import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 @Composable
 fun AlarmDetailScreen(
     modifier: Modifier = Modifier,
-    alarmId: String? = null,
+    alarmId: Int? = null,
     state: AlarmDetailState,
     onAction: (AlarmDetailAction) -> Unit,
 ) {
@@ -87,7 +87,7 @@ fun AlarmDetailScreen(
 private fun AlarmDetailDialogPreview() {
     SnoozelooBackground {
         AlarmDetailScreen(
-            alarmId = "1",
+            alarmId = 1,
             state = AlarmDetailState(),
             onAction = {},
             modifier = Modifier.systemBarsPadding()

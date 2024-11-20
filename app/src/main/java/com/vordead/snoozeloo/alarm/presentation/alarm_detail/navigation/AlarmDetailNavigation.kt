@@ -15,9 +15,9 @@ import com.vordead.snoozeloo.core.presentation.util.ObserveAsEvents
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AlarmDetail(val id: String? = null)
+data class AlarmDetail(val id: Int? = null)
 
-fun NavController.navigateToAlarmDetail(id: String) = navigate(AlarmDetail(id))
+fun NavController.navigateToAlarmDetail(id: Int?) = navigate(AlarmDetail(id))
 
 
 fun NavGraphBuilder.alarmDetailDestination(

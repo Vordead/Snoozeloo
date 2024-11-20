@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "alarms")
 data class AlarmEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int? = 0,
     val time: String, // Format "HH:mm"
     val isEnabled: Boolean,
     val repeatDays: List<String>, // List of days the alarm repeats on

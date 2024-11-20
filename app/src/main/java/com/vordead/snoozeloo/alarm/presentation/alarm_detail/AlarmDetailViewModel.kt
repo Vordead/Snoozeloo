@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.vordead.snoozeloo.alarm.data.local.LocalAlarmDataSource
 import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarm
+import com.vordead.snoozeloo.alarm.presentation.models.toAlarmUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,20 +32,59 @@ class AlarmDetailViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000)
     )
 
-    fun onAlarmNameChange(alarmName: String) {
+
+    fun loadAlarm(alarmId: String?) {
         viewModelScope.launch {
+            val alarm = alarmId?.let { localAlarmDataSource.getAlarmById(it.toInt()) }?.toAlarmUi()
             _uiState.update {
                 it.copy(
-                    alarm = it.alarm?.copy(title = alarmName),
-                    showAlarmNameDialog = false
+                    alarm = alarm,
+                    hourField = alarm?.time?.split(":")?.get(0) ?: "",
+                    minuteField = alarm?.time?.split(":")?.get(1) ?: "",
+                    alarmName = alarm?.title ?: ""
                 )
             }
         }
     }
 
-    fun createOrUpdateAlarm(alarm: AlarmUi) {
+    fun onTimeChange(hour: String? = null, minute: String? = null) {
         viewModelScope.launch {
-            localAlarmDataSource.upsertAlarm(alarm.toAlarm())
+            _uiState.update {
+                it.copy(
+                    hourField = hour ?: it.hourField,
+                    minuteField = minute ?: it.minuteField
+                )
+            }
+        }
+    }
+
+    fun onAlarmNameChange(alarmName: String) {
+        _uiState.update {
+            it.copy(
+                alarmName = alarmName,
+                showAlarmNameDialog = false
+            )
+        }
+    }
+
+
+    fun saveAlarm() {
+        viewModelScope.launch {
+            val currentState = _uiState.value
+            if (currentState.isAlarmValid) {
+                val alarm = currentState.alarm?.copy(
+                    title = currentState.alarmName,
+                    time = "${currentState.hourField}:${currentState.minuteField}"
+                ) ?: AlarmUi(
+                    title = currentState.alarmName,
+                    time = "${currentState.hourField}:${currentState.minuteField}",
+                    period = "", // Set default or handle accordingly
+                    isEnabled = true,
+                    remainingTime = ""
+                )
+                localAlarmDataSource.upsertAlarm(alarm.toAlarm())
+                _alarmDetailEvents.send(AlarmDetailEvent.NavigateBack)
+            }
         }
     }
 
@@ -77,12 +117,11 @@ class AlarmDetailViewModel @Inject constructor(
                 }
 
                 AlarmDetailAction.OnSaveClick -> {
-                    createOrUpdateAlarm(_uiState.value.alarm ?: return@launch)
-                    _alarmDetailEvents.send(AlarmDetailEvent.NavigateBack)
+                    saveAlarm()
                 }
 
                 is AlarmDetailAction.OnTimeChange -> {
-                    // Handle time change
+                    onTimeChange(action.hour, action.minute)
                 }
             }
         }

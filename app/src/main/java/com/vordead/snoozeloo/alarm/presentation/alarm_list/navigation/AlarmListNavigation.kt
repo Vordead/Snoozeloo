@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 data object AlarmListNavigation
 
 fun NavGraphBuilder.alarmListDestination(
-    onNavigateToAlarmDetail: (alarmId: String) -> Unit
+    onNavigateToAlarmDetail: (alarmId: Int?) -> Unit
 ) {
     composable<AlarmListNavigation> {
         val alarmListViewModel: AlarmListViewModel = hiltViewModel()

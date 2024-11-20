@@ -146,7 +146,7 @@ private fun AlarmListItemPreview() {
     SnoozelooBackground {
         AlarmListItem(
             alarmUi = AlarmUi(
-                id = "1",
+                id = 1,
                 title = "Wake Up",
                 time = "10:00",
                 period = "AM",

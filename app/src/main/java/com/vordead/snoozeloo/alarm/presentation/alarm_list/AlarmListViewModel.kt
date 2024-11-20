@@ -42,7 +42,7 @@ class AlarmListViewModel @Inject constructor(
             AlarmListState()
         )
 
-    fun onAlarmSwitchClick(alarmId: String, isChecked: Boolean) {
+    fun onAlarmSwitchClick(alarmId: Int, isChecked: Boolean) {
         viewModelScope.launch {
             val updatedAlarm = state.value.alarms.find { it.id == alarmId }?.copy(isEnabled = isChecked)
             if (updatedAlarm != null) {
@@ -71,7 +71,7 @@ class AlarmListViewModel @Inject constructor(
                 }
 
                 AlarmListAction.onCreateAlarmClick -> {
-                    _alarmListEvents.send(AlarmListEvent.NavigateToAlarmDetail(""))
+                    _alarmListEvents.send(AlarmListEvent.NavigateToAlarmDetail())
                 }
 
                 is AlarmListAction.onAlarmClick -> {

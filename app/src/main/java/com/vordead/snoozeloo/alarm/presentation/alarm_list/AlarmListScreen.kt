@@ -68,10 +68,10 @@ fun AlarmListScreen(
                     AlarmList(
                         alarms = state.alarms,
                         onAlarmClick = { alarm ->
-                            onAction(AlarmListAction.onAlarmClick(alarm.id))
+                            onAction(AlarmListAction.onAlarmClick(alarm.id!!))
                         },
                         onAlarmSwitchClick = { alarm, isChecked ->
-                            onAction(AlarmListAction.onAlarmSwitchClick(alarm.id, isChecked))
+                            onAction(AlarmListAction.onAlarmSwitchClick(alarm.id!!, isChecked))
                         },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -91,7 +91,7 @@ private fun AlarmListScreenPreview() {
             state = AlarmListState(
                 alarms = listOf(
                     AlarmUi(
-                        id = "1",
+                        id = 1,
                         title = "Alarm 1",
                         time = "10:00",
                         period = "AM",

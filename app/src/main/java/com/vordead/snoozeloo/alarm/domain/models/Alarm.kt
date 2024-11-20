@@ -1,7 +1,7 @@
 package com.vordead.snoozeloo.alarm.domain.models
 
 data class Alarm(
-    val id: Int = 0,
+    val id: Int? = null,
     val time: String, // Format "HH:mm"
     val isEnabled: Boolean,
     val repeatDays: List<String>,
