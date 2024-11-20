@@ -37,7 +37,6 @@ fun AlarmDetailScreen(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var test by remember { mutableStateOf("") }
     LaunchedEffect(alarmId) {
         onAction(AlarmDetailAction.OnLoadAlarm(alarmId))
     }
