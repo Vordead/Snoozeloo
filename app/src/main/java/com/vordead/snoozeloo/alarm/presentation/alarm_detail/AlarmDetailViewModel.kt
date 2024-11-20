@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AlarmDetailViewModel @Inject constructor(
-    private val localAlarmDataSource: LocalAlarmDataSource
+    private val localAlarmDataSource: LocalAlarmDataSource,
 ) : ViewModel() {
 
     private val _alarmDetailEvents = Channel<AlarmDetailEvent>()
@@ -33,9 +33,9 @@ class AlarmDetailViewModel @Inject constructor(
     )
 
 
-    fun loadAlarm(alarmId: String?) {
+    fun loadAlarm(alarmId: Int?) {
         viewModelScope.launch {
-            val alarm = alarmId?.let { localAlarmDataSource.getAlarmById(it.toInt()) }?.toAlarmUi()
+            val alarm = alarmId?.let { localAlarmDataSource.getAlarmById(it) }?.toAlarmUi()
             _uiState.update {
                 it.copy(
                     alarm = alarm,
@@ -122,6 +122,9 @@ class AlarmDetailViewModel @Inject constructor(
 
                 is AlarmDetailAction.OnTimeChange -> {
                     onTimeChange(action.hour, action.minute)
+                }
+                is AlarmDetailAction.OnLoadAlarm -> {
+                    loadAlarm(action.alarmId)
                 }
             }
         }

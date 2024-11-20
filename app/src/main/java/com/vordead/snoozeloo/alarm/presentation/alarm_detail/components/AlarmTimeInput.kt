@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -33,25 +32,22 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.R
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.TimeInputState
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.rememberTimeInputState
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.hourInput
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.minuteInput
 
 @Composable
 fun AlarmTimeInput(
+    state: TimeInputState,
     modifier: Modifier = Modifier,
-    hour : String = "",
-    minute : String = "",
-    onTimeChange: (String, String) -> Unit
 ) {
-    val hourTextInputState = rememberTextFieldState(hour)
-    val minuteTextInputState = rememberTextFieldState(minute)
 
     var shouldShowTimeLeft by remember { mutableStateOf(false) }
 
-    LaunchedEffect(hourTextInputState.text, minuteTextInputState.text) {
-        onTimeChange(hourTextInputState.text.toString(), minuteTextInputState.text.toString())
+    LaunchedEffect(state.hourState.text, state.minuteState.text) {
         shouldShowTimeLeft =
-            hourTextInputState.text.isNotEmpty() && minuteTextInputState.text.isNotEmpty()
+            state.hourState.text.isNotEmpty() && state.minuteState.text.isNotEmpty()
     }
 
     Card(
@@ -71,7 +67,7 @@ fun AlarmTimeInput(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TimeInputField(
-                    state = hourTextInputState,
+                    state = state.hourState,
                     inputTransformation = InputTransformation.hourInput(),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 )
@@ -82,7 +78,7 @@ fun AlarmTimeInput(
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 TimeInputField(
-                    state = minuteTextInputState,
+                    state = state.minuteState,
                     inputTransformation = InputTransformation.minuteInput(),
                     modifier = Modifier
                 )
@@ -105,5 +101,7 @@ fun AlarmTimeInput(
 @Preview
 @Composable
 fun AlarmTimeInputPreview() {
-    AlarmTimeInput(onTimeChange = { _, _ -> }, modifier = Modifier.systemBarsPadding())
+    AlarmTimeInput(
+        state = rememberTimeInputState(), modifier = Modifier.systemBarsPadding()
+    )
 }

@@ -1,6 +1,7 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_detail
 
 sealed interface AlarmDetailAction {
+    data class  OnLoadAlarm(val alarmId: Int? = null) : AlarmDetailAction
     data class OnSaveAlarmName(val alarmName: String? = null) : AlarmDetailAction
     data object OnSaveClick : AlarmDetailAction
     data object OnBackClick : AlarmDetailAction
