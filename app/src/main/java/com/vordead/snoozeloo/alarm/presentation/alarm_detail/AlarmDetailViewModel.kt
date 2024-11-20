@@ -41,7 +41,7 @@ class AlarmDetailViewModel @Inject constructor(
                     alarm = alarm,
                     hourField = alarm?.time?.split(":")?.get(0) ?: "",
                     minuteField = alarm?.time?.split(":")?.get(1) ?: "",
-                    alarmName = alarm?.title ?: ""
+                    alarmName = alarm?.title
                 )
             }
         }
@@ -73,10 +73,10 @@ class AlarmDetailViewModel @Inject constructor(
             val currentState = _uiState.value
             if (currentState.isAlarmValid) {
                 val alarm = currentState.alarm?.copy(
-                    title = currentState.alarmName,
+                    title = if(currentState.alarmName?.isNotBlank() == true) currentState.alarmName else null,
                     time = "${currentState.hourField}:${currentState.minuteField}"
                 ) ?: AlarmUi(
-                    title = currentState.alarmName,
+                    title = if(currentState.alarmName?.isNotBlank() == true) currentState.alarmName else null,
                     time = "${currentState.hourField}:${currentState.minuteField}",
                     period = "", // Set default or handle accordingly
                     isEnabled = true,

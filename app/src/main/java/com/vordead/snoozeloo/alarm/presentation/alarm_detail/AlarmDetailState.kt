@@ -8,7 +8,7 @@ data class AlarmDetailState(
     val alarm: AlarmUi? = null,
     val hourField: String = "",
     val minuteField: String = "",
-    val alarmName : String = "",
+    val alarmName : String ? = null,
     val showAlarmNameDialog: Boolean = false,
 ) {
     val isAlarmValid: Boolean

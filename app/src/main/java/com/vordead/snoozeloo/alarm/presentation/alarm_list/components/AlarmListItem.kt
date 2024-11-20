@@ -58,7 +58,7 @@ fun AlarmListItem(
 
 @Composable
 fun AlarmHeader(
-    title: String,
+    title: String?,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -68,7 +68,7 @@ fun AlarmHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = title,
+            text = title ?: "Alarm",
             modifier = Modifier.padding(bottom = 10.dp),
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
         )
