@@ -13,6 +13,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmDetailAppBar
@@ -30,11 +31,16 @@ fun AlarmDetailScreen(
     state: AlarmDetailState,
     onAction: (AlarmDetailAction) -> Unit,
 ) {
-    val timeInputState = rememberTimeInputState(state.hourField,state.minuteField)
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(alarmId) {
         onAction(AlarmDetailAction.OnLoadAlarm(alarmId))
     }
+
+    val timeInputState =
+        rememberTimeInputState(state.hourField, state.minuteField) { hour, minute ->
+            onAction(AlarmDetailAction.OnTimeChange(hour, minute))
+        }
 
     if (state.showAlarmNameDialog) {
         AlarmFieldChangeDialog(
@@ -51,8 +57,14 @@ fun AlarmDetailScreen(
             title = {
                 AlarmDetailAppBar(
                     isAlarmValid = state.isAlarmValid,
-                    onBackClick = { onAction(AlarmDetailAction.OnBackClick) },
-                    onSaveClick = { onAction(AlarmDetailAction.OnSaveClick) },
+                    onBackClick = {
+                        keyboardController?.hide()
+                        onAction(AlarmDetailAction.OnBackClick)
+                    },
+                    onSaveClick = {
+                        keyboardController?.hide()
+                        onAction(AlarmDetailAction.OnSaveClick)
+                    },
                     modifier = Modifier
                 )
             },
@@ -85,7 +97,6 @@ fun AlarmDetailScreen(
     }
 
 }
-
 
 
 @Preview
