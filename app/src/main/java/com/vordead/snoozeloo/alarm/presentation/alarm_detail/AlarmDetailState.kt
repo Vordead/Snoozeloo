@@ -12,5 +12,5 @@ data class AlarmDetailState(
     val showAlarmNameDialog: Boolean = false,
 ) {
     val isAlarmValid: Boolean
-        get() = hourField.isNotBlank() && minuteField.isNotBlank()
+        get() = hourField.length == 2 && minuteField.length == 2
 }
