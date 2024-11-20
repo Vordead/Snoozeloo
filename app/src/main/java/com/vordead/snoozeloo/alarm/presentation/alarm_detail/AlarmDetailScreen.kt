@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -14,15 +12,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmDetailAppBar
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmFieldChangeDialog
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmSetting
-import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmTimeInput
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.time_input.AlarmTimeInput
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.time_input.rememberTimeInputState
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,19 +30,12 @@ fun AlarmDetailScreen(
     state: AlarmDetailState,
     onAction: (AlarmDetailAction) -> Unit,
 ) {
-    val timeInputState = rememberTimeInputState()
+    val timeInputState = rememberTimeInputState(state.hourField,state.minuteField)
+
     LaunchedEffect(alarmId) {
         onAction(AlarmDetailAction.OnLoadAlarm(alarmId))
     }
 
-    LaunchedEffect(state.hourField,state.minuteField) {
-        timeInputState.hourState.edit{
-            append(state.hourField)
-        }
-        timeInputState.minuteState.edit{
-            append(state.minuteField)
-        }
-    }
     if (state.showAlarmNameDialog) {
         AlarmFieldChangeDialog(
             onSaveClicked = { onAction(AlarmDetailAction.OnSaveAlarmName(it)) },
@@ -96,23 +86,7 @@ fun AlarmDetailScreen(
 
 }
 
-@Stable
-class TimeInputState(
-    val hourState : TextFieldState,
-    val minuteState: TextFieldState
-)
 
-@Composable
-fun rememberTimeInputState(
-    initialHour: String ="",
-    initialMinute: String=""
-): TimeInputState {
-    val hourTextInputState = rememberTextFieldState(initialHour)
-    val minuteTextInputState = rememberTextFieldState(initialMinute)
-    return remember {
-        TimeInputState(hourTextInputState, minuteTextInputState)
-    }
-}
 
 @Preview
 @Composable

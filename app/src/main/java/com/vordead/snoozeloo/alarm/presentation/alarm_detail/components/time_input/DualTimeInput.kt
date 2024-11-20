@@ -1,4 +1,4 @@
-package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components
+package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.time_input
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -32,8 +32,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.R
-import com.vordead.snoozeloo.alarm.presentation.alarm_detail.TimeInputState
-import com.vordead.snoozeloo.alarm.presentation.alarm_detail.rememberTimeInputState
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.hourInput
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.minuteInput
 
