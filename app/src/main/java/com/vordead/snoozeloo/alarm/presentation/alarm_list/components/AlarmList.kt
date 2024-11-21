@@ -21,7 +21,7 @@ fun AlarmList(
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(alarms) { alarm ->
+        items(alarms, key = { alarm -> alarm.hashCode() }) { alarm ->
             AlarmListItem(
                 alarmUi = alarm,
                 onAlarmClick = {

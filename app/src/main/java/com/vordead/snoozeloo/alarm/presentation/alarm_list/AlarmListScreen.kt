@@ -1,12 +1,14 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -15,6 +17,7 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -25,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AddAlarmFab
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AlarmList
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AppBar
+import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.EmptyData
 import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 
@@ -50,7 +54,7 @@ fun AlarmListScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .statusBarsPadding()
-                    .consumeWindowInsets(paddingValues)
+                    .consumeWindowInsets(paddingValues),
             ) {
                 AppBar(
                     title = "Your Alarms",
@@ -64,20 +68,50 @@ fun AlarmListScreen(
                             shape = CircleShape
                         )
                 )
-                Box {
-                    AlarmList(
-                        alarms = state.alarms,
-                        onAlarmClick = { alarm ->
-                            onAction(AlarmListAction.onAlarmClick(alarm.id!!))
-                        },
-                        onAlarmSwitchClick = { alarm, isChecked ->
-                            onAction(AlarmListAction.onAlarmSwitchClick(alarm.id!!, isChecked))
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    LandingHeader()
-                }
+                when (val uiState = state.uiState) {
+                    is AlarmListUiState.Loading -> {
+                        // Show loading indicator
+                    }
 
+                    is AlarmListUiState.Success -> {
+                        if (uiState.alarms.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .navigationBarsPadding()
+                                    .background(MaterialTheme.colorScheme.background)
+                            ) {
+                                EmptyData(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                )
+                            }
+                        } else {
+                            Box {
+                                AlarmList(
+                                    alarms = uiState.alarms,
+                                    onAlarmClick = { alarm ->
+                                        onAction(AlarmListAction.onAlarmClick(alarm.id!!))
+                                    },
+                                    onAlarmSwitchClick = { alarm, isChecked ->
+                                        onAction(
+                                            AlarmListAction.onAlarmSwitchClick(
+                                                alarm.id!!,
+                                                isChecked
+                                            )
+                                        )
+                                    },
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                                LandingHeader()
+                            }
+                        }
+                    }
+
+                    is AlarmListUiState.Error -> {
+                        // Show error message
+                    }
+                }
             }
         }
     )
@@ -89,17 +123,19 @@ private fun AlarmListScreenPreview() {
     SnoozelooBackground {
         AlarmListScreen(
             state = AlarmListState(
-                alarms = listOf(
-                    AlarmUi(
-                        id = 1,
-                        title = "Alarm 1",
-                        hour = 10,
-                        minute = 12,
-                        period = "AM",
-                        remainingTime = "30min",
-                        repeatDays = emptyList(),
-                        isEnabled = true
-                    ),
+                uiState = AlarmListUiState.Success(
+                    alarms = listOf(
+                        AlarmUi(
+                            id = 1,
+                            title = "Alarm 1",
+                            hour = 10,
+                            minute = 12,
+                            period = "AM",
+                            remainingTime = "30min",
+                            repeatDays = emptyList(),
+                            isEnabled = true
+                        ),
+                    )
                 )
             ),
             onAction = {}
