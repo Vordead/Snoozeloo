@@ -3,6 +3,7 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vordead.snoozeloo.alarm.data.local.LocalAlarmDataSource
+import com.vordead.snoozeloo.alarm.domain.AlarmDataSource
 import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarm
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarmUi
@@ -18,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AlarmDetailViewModel @Inject constructor(
-    private val localAlarmDataSource: LocalAlarmDataSource,
+    private val localAlarmDataSource: AlarmDataSource,
 ) : ViewModel() {
 
     private val _alarmDetailEvents = Channel<AlarmDetailEvent>()
