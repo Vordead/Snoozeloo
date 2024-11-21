@@ -35,7 +35,9 @@ import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.R
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.hourInput
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.minuteInput
-import com.vordead.snoozeloo.alarm.presentation.models.calculateRemainingTime
+import java.time.LocalDateTime
+import java.time.LocalTime
+import kotlin.text.toIntOrNull
 
 @Composable
 fun AlarmTimeInput(
@@ -44,10 +46,16 @@ fun AlarmTimeInput(
 ) {
 
     var shouldShowTimeLeft by remember { mutableStateOf(false) }
+    var remainingTime by remember { mutableStateOf("") }
 
     LaunchedEffect(state.hourState.text, state.minuteState.text) {
         shouldShowTimeLeft =
             state.hourState.text.isNotEmpty() && state.minuteState.text.isNotEmpty()
+        if (shouldShowTimeLeft) {
+            val hour = state.hourState.text.toString().toIntOrNull() ?: 0
+            val minute = state.minuteState.text.toString().toIntOrNull() ?: 0
+            remainingTime = calculateRemainingTime(hour, minute)
+        }
     }
 
     Card(
@@ -90,7 +98,7 @@ fun AlarmTimeInput(
                 exit = fadeOut()
             ) {
                 Text(
-                    "Alarm in 8h 13min",
+                    "Alarm in $remainingTime",
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
             }
@@ -104,4 +112,24 @@ fun AlarmTimeInputPreview() {
     AlarmTimeInput(
         state = rememberTimeInputState(), modifier = Modifier.systemBarsPadding()
     )
+}
+
+fun calculateRemainingTime(hour: Int, minute: Int): String {
+    val now = LocalDateTime.now().withSecond(0).withNano(0)
+    val alarmTime = LocalTime.of(hour, minute)
+    val alarmDateTime =
+        if (alarmTime.isAfter(now.toLocalTime()) || alarmTime == now.toLocalTime()) {
+            now.withHour(alarmTime.hour).withMinute(alarmTime.minute)
+        } else {
+            now.plusDays(1).withHour(alarmTime.hour).withMinute(alarmTime.minute)
+        }
+
+    val duration = java.time.Duration.between(now, alarmDateTime)
+    val hours = duration.toHours()
+    val minutes = duration.toMinutes() % 60
+
+    return when {
+        hours > 0 -> "${hours}h ${minutes}min"
+        else -> "${minutes}min"
+    }
 }
