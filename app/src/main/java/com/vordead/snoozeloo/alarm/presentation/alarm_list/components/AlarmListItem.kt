@@ -50,8 +50,8 @@ fun AlarmListItem(
                 checked = alarmUi.isEnabled,
                 onCheckedChange = { onAlarmSwitchClick(it) }
             )
-            TimeDisplay(time = alarmUi.time, period = alarmUi.period)
-            AlarmFooter(alarmUi.remainingTime)
+            TimeDisplay(time = "${alarmUi.hour}:${alarmUi.minute}", period = alarmUi.period)
+            AlarmFooter(alarmUi.remainingTime ?: "N/A")
         }
     }
 }
@@ -143,10 +143,12 @@ private fun AlarmListItemPreview() {
             alarmUi = AlarmUi(
                 id = 1,
                 title = "Wake Up",
-                time = "10:00",
+                hour = 10,
+                minute = 14,
                 period = "AM",
                 remainingTime = "30min",
-                isEnabled = true
+                isEnabled = true,
+                repeatDays = emptyList()
             ),
             onAlarmClick = {},
             onAlarmSwitchClick = {}

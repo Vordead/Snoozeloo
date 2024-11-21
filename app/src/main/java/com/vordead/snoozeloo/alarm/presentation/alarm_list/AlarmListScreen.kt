@@ -93,9 +93,11 @@ private fun AlarmListScreenPreview() {
                     AlarmUi(
                         id = 1,
                         title = "Alarm 1",
-                        time = "10:00",
+                        hour = 10,
+                        minute = 12,
                         period = "AM",
                         remainingTime = "30min",
+                        repeatDays = emptyList(),
                         isEnabled = true
                     ),
                 )

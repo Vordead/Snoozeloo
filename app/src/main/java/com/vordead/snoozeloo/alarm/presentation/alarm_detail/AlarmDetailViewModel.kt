@@ -40,9 +40,9 @@ class AlarmDetailViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     alarm = alarm,
-                    hourField = alarm?.time?.split(":")?.get(0) ?: "",
-                    minuteField = alarm?.time?.split(":")?.get(1) ?: "",
-                    alarmName = alarm?.title
+                    hourField = alarm?.hour.toString(),
+                    minuteField = alarm?.minute.toString(),
+                    alarmName = alarm?.title,
                 )
             }
         }
@@ -75,13 +75,15 @@ class AlarmDetailViewModel @Inject constructor(
             if (currentState.isAlarmValid) {
                 val alarm = currentState.alarm?.copy(
                     title = if(currentState.alarmName?.isNotBlank() == true) currentState.alarmName else null,
-                    time = "${currentState.hourField}:${currentState.minuteField}"
+                    hour = currentState.hourField.toIntOrNull() ?: 0,
+                    minute = currentState.minuteField.toInt()
                 ) ?: AlarmUi(
                     title = if(currentState.alarmName?.isNotBlank() == true) currentState.alarmName else null,
-                    time = "${currentState.hourField}:${currentState.minuteField}",
+                    hour = currentState.hourField.toIntOrNull() ?: 0,
+                    minute = currentState.minuteField.toIntOrNull() ?: 0,
                     period = "", // Set default or handle accordingly
                     isEnabled = true,
-                    remainingTime = ""
+                    repeatDays = emptyList()
                 )
                 localAlarmDataSource.upsertAlarm(alarm.toAlarm())
                 _alarmDetailEvents.send(AlarmDetailEvent.NavigateBack)
