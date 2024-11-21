@@ -44,9 +44,6 @@ fun Alarm.toAlarmUi(): AlarmUi {
 }
 
 fun AlarmUi.toAlarm(): Alarm {
-    val hour24 = if (period == "AM") hour % 12 else (hour % 12) + 12
-    val time = String.format("%02d:%02d", hour24, minute)
-
     return Alarm(
         id = id,
         alarmName = title,
@@ -71,7 +68,7 @@ fun calculateRemainingTime(alarmTime: LocalTime): String {
     val minutes = duration.toMinutes() % 60
 
     return when {
-        hours > 0 -> "Alarm in ${hours}h ${minutes}min"
-        else -> "Alarm in ${minutes}min"
+        hours > 0 -> "${hours}h ${minutes}min"
+        else -> "${minutes}min"
     }
 }
