@@ -40,8 +40,8 @@ class AlarmDetailViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     alarm = alarm,
-                    hourField = alarm?.hour.toString(),
-                    minuteField = alarm?.minute.toString(),
+                    hourField = alarm?.hour?.toString()?.padStart(2, '0') ?: "",
+                    minuteField = alarm?.minute?.toString()?.padStart(2, '0') ?: "",
                     alarmName = alarm?.title,
                 )
             }

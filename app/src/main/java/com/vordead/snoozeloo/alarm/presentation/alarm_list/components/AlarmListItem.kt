@@ -50,7 +50,7 @@ fun AlarmListItem(
                 checked = alarmUi.isEnabled,
                 onCheckedChange = { onAlarmSwitchClick(it) }
             )
-            TimeDisplay(time = "${alarmUi.hour}:${alarmUi.minute}", period = alarmUi.period)
+            TimeDisplay(time = alarmUi.time, period = alarmUi.period)
             AlarmFooter(alarmUi.remainingTime ?: "N/A")
         }
     }

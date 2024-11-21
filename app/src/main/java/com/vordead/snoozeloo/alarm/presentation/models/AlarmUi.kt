@@ -1,11 +1,10 @@
 package com.vordead.snoozeloo.alarm.presentation.models
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.vordead.snoozeloo.alarm.domain.models.Alarm
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 data class AlarmUi(
     val id: Int? = null,
@@ -16,7 +15,10 @@ data class AlarmUi(
     val isEnabled: Boolean = false,
     val remainingTime: String? = null,
     val repeatDays: List<DayOfWeek>
-)
+) {
+    val time: String
+        get() = String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
+}
 
 enum class DayOfWeek {
     Mo, Tu, We, Th, Fr, Sa, Su
@@ -56,11 +58,13 @@ fun AlarmUi.toAlarm(): Alarm {
 
 fun calculateRemainingTime(alarmTime: LocalTime): String {
     val now = LocalDateTime.now()
-    val alarmDateTime = if (alarmTime.isAfter(now.toLocalTime()) || alarmTime == now.toLocalTime()) {
-        now.withHour(alarmTime.hour).withMinute(alarmTime.minute).withSecond(0).withNano(0)
-    } else {
-        now.plusDays(1).withHour(alarmTime.hour).withMinute(alarmTime.minute).withSecond(0).withNano(0)
-    }
+    val alarmDateTime =
+        if (alarmTime.isAfter(now.toLocalTime()) || alarmTime == now.toLocalTime()) {
+            now.withHour(alarmTime.hour).withMinute(alarmTime.minute).withSecond(0).withNano(0)
+        } else {
+            now.plusDays(1).withHour(alarmTime.hour).withMinute(alarmTime.minute).withSecond(0)
+                .withNano(0)
+        }
 
     val duration = java.time.Duration.between(now, alarmDateTime)
     val hours = duration.toHours()
