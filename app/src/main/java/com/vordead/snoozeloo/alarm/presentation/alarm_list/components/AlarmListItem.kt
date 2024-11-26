@@ -16,10 +16,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,12 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vordead.snoozeloo.alarm.presentation.models.AlarmListItemUi
+import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 
 @Composable
 fun AlarmListItem(
-    alarmListItemUi: AlarmListItemUi,
+    alarmUi: AlarmUi,
     onAlarmSwitchClick: (Boolean) -> Unit,
     onAlarmClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -50,30 +46,29 @@ fun AlarmListItem(
                 .padding(16.dp),
         ) {
             AlarmHeader(
-                title = alarmListItemUi.title,
-                checked = alarmListItemUi.isEnabled,
+                title = alarmUi.title,
+                checked = alarmUi.isEnabled,
                 onCheckedChange = { onAlarmSwitchClick(it) }
             )
-            TimeDisplay(time = "10:00", period = "AM")
-            AlarmFooter("30min")
+            TimeDisplay(time = alarmUi.time, period = alarmUi.period)
+            AlarmFooter(alarmUi.remainingTime ?: "N/A")
         }
     }
 }
 
 @Composable
 fun AlarmHeader(
-    title: String,
+    title: String?,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    var test by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = title,
+            text = title ?: "Alarm",
             modifier = Modifier.padding(bottom = 10.dp),
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
         )
@@ -145,13 +140,15 @@ fun AlarmFooter(
 private fun AlarmListItemPreview() {
     SnoozelooBackground {
         AlarmListItem(
-            alarmListItemUi = AlarmListItemUi(
-                id = "1",
+            alarmUi = AlarmUi(
+                id = 1,
                 title = "Wake Up",
-                time = "10:00",
+                hour = 10,
+                minute = 14,
                 period = "AM",
                 remainingTime = "30min",
-                isEnabled = true
+                isEnabled = true,
+                repeatDays = emptyList()
             ),
             onAlarmClick = {},
             onAlarmSwitchClick = {}

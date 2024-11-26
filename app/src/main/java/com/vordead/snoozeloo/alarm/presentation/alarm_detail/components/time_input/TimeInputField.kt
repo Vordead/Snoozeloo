@@ -1,4 +1,4 @@
-package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components
+package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.time_input
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke

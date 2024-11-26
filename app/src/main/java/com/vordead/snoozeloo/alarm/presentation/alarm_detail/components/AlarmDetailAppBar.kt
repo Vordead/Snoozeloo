@@ -29,6 +29,7 @@ import com.vordead.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
 fun AlarmDetailAppBar(
+    isAlarmValid: Boolean,
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -49,6 +50,7 @@ fun AlarmDetailAppBar(
 
         FilledTonalButton(
             onSaveClick,
+            enabled = isAlarmValid,
             colors = ButtonDefaults.filledTonalButtonColors(containerColor = Color(0xFF4664FF), contentColor = Color.White),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
         ) {
@@ -69,6 +71,7 @@ fun AlarmDetailAppBar(
 fun AlarmDetailAppBarPreview() {
     SnoozelooTheme {
         AlarmDetailAppBar(
+            isAlarmValid = false,
             onBackClick = {},
             onSaveClick = {},
             modifier = Modifier.systemBarsPadding()

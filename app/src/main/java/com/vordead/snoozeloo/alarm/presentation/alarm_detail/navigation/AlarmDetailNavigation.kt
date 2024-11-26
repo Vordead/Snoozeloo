@@ -8,20 +8,21 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.vordead.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailAction
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailEvent
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailScreen
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.AlarmDetailViewModel
+import com.vordead.snoozeloo.core.presentation.util.ObserveAsEvents
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AlarmDetail(val id: String? = null)
+data class AlarmDetail(val id: Int? = null)
 
-fun NavController.navigateToAlarmDetail(id: String) = navigate(AlarmDetail(id))
+fun NavController.navigateToAlarmDetail(id: Int?) = navigate(AlarmDetail(id))
 
 
 fun NavGraphBuilder.alarmDetailDestination(
     onNavigateBack: () -> Unit,
-    onNavigateToRingtoneSettings : () -> Unit,
+    onNavigateToRingtoneSettings: () -> Unit,
 ) {
     composable<AlarmDetail>(
         enterTransition = {
@@ -34,35 +35,20 @@ fun NavGraphBuilder.alarmDetailDestination(
         val args = backStackEntry.toRoute<AlarmDetail>()
         val vm: AlarmDetailViewModel = hiltViewModel()
         val uiState = vm.uiState.collectAsStateWithLifecycle()
+
+        ObserveAsEvents(
+            events = vm.alarmDetailEvents,
+            onEvent = { event ->
+                when (event) {
+                    is AlarmDetailEvent.NavigateBack -> onNavigateBack()
+                }
+            }
+        )
+
         AlarmDetailScreen(
             alarmId = args.id,
             state = uiState.value,
-            onAction = {
-                when (it) {
-                    is AlarmDetailAction.OnSaveClick -> {
-                        onNavigateBack()
-                    }
-
-                    is AlarmDetailAction.OnBackClick -> {
-                        onNavigateBack()
-                    }
-
-                    is AlarmDetailAction.OnAlarmNameClick -> {
-                        vm.showAlarmDialog(true)
-                    }
-
-                    is AlarmDetailAction.OnTimeChange -> {
-                        // Handle time change
-                    }
-
-                    is AlarmDetailAction.OnSaveAlarmName -> {
-                        vm.onAlarmNameChange(it.alarmName ?: "")
-                    }
-
-                    AlarmDetailAction.OnDismissAlarmNameDialog -> {
-                        vm.showAlarmDialog(false)                    }
-                }
-            }
+            onAction = vm::onAction
         )
     }
 }

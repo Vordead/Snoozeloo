@@ -2,101 +2,91 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vordead.snoozeloo.alarm.presentation.models.AlarmListItemUi
+import com.vordead.snoozeloo.alarm.domain.AlarmDataSource
+import com.vordead.snoozeloo.alarm.presentation.models.toAlarm
+import com.vordead.snoozeloo.alarm.presentation.models.toAlarmUi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AlarmListViewModel @Inject constructor() : ViewModel() {
+class AlarmListViewModel @Inject constructor(
+    private val localAlarmDataSource: AlarmDataSource
+) : ViewModel() {
+
+    private val _alarmListEvents = Channel<AlarmListEvent>()
+    val alarmListEvents = _alarmListEvents.receiveAsFlow()
+
     private val _alarmListState = MutableStateFlow(AlarmListState())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     val state = _alarmListState
-        .onStart { loadAlarms() }
+        .flatMapLatest {
+            localAlarmDataSource.getAllAlarms()
+                .map { alarms ->
+                    AlarmListState(uiState = AlarmListUiState.Success(alarms.map { it.toAlarmUi() }))
+                }
+                .catch { e ->
+                    emit(AlarmListState(uiState = AlarmListUiState.Error(e.message ?: "Unknown error")))
+                }
+        }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
-            AlarmListState()
+            AlarmListState(AlarmListUiState.Loading)
         )
 
-
-    fun onAlarmSwitchClick(alarmId: String, isChecked: Boolean) {
+    fun onAlarmSwitchClick(alarmId: Int, isChecked: Boolean) {
         viewModelScope.launch {
-            _alarmListState.update {
-                it.copy(
-                    alarms = it.alarms.map { alarm ->
-                        if (alarm.id == alarmId) {
-                            alarm.copy(isEnabled = isChecked)
-                        } else {
-                            alarm
-                        }
+            val currentState = state.value.uiState
+            if (currentState is AlarmListUiState.Success) {
+                val updatedAlarm = currentState.alarms.find { it.id == alarmId }?.copy(isEnabled = isChecked)
+                if (updatedAlarm != null) {
+                    localAlarmDataSource.upsertAlarm(updatedAlarm.toAlarm())
+                    _alarmListState.update {
+                        it.copy(
+                            uiState = AlarmListUiState.Success(
+                                currentState.alarms.map { alarm ->
+                                    if (alarm.id == alarmId) {
+                                        alarm.copy(isEnabled = isChecked)
+                                    } else {
+                                        alarm
+                                    }
+                                }
+                            )
+                        )
                     }
-                )
+                }
             }
         }
     }
 
-    private fun loadAlarms() {
+
+    fun onAction(action: AlarmListAction) {
         viewModelScope.launch {
-            _alarmListState.update {
-                it.copy(
-                    alarms = listOf(
-                        AlarmListItemUi(
-                            id = "1",
-                            title = "Alarm 1",
-                            time = "10:00",
-                            period = "AM",
-                            remainingTime = "30min",
-                            isEnabled = false
-                        ),
-                        AlarmListItemUi(
-                            id = "2",
-                            title = "Alarm 2",
-                            time = "11:00",
-                            period = "AM",
-                            remainingTime = "1h",
-                            isEnabled = true
-                        ),
-                        AlarmListItemUi(
-                            id = "3",
-                            title = "Alarm 3",
-                            time = "12:00",
-                            period = "PM",
-                            remainingTime = "2h",
-                            isEnabled = false
-                        ),
-                        AlarmListItemUi(
-                            id = "4",
-                            title = "Alarm 4",
-                            time = "01:00",
-                            period = "PM",
-                            remainingTime = "3h",
-                            isEnabled = true
-                        ),
-                        AlarmListItemUi(
-                            id = "5",
-                            title = "Alarm 5",
-                            time = "02:00",
-                            period = "PM",
-                            remainingTime = "4h",
-                            isEnabled = false
-                        ),
-                        AlarmListItemUi(
-                            id = "6",
-                            title = "Alarm 6",
-                            time = "03:00",
-                            period = "PM",
-                            remainingTime = "5h",
-                            isEnabled = true
-                        ),
-                    )
-                )
+            when (action) {
+                is AlarmListAction.onAlarmSwitchClick -> {
+                    onAlarmSwitchClick(action.alarmId, action.isChecked)
+                }
+
+                AlarmListAction.onCreateAlarmClick -> {
+                    _alarmListEvents.send(AlarmListEvent.NavigateToAlarmDetail())
+                }
+
+                is AlarmListAction.onAlarmClick -> {
+                    _alarmListEvents.send(AlarmListEvent.NavigateToAlarmDetail(action.alarmId))
+                }
             }
         }
     }
-
 }

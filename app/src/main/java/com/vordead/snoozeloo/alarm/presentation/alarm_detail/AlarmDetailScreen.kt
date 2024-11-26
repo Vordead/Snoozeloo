@@ -11,27 +11,45 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmDetailAppBar
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmFieldChangeDialog
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmSetting
-import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.AlarmTimeInput
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.time_input.AlarmTimeInput
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.time_input.rememberTimeInputState
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlarmDetailScreen(
     modifier: Modifier = Modifier,
-    alarmId: String? = null,
+    alarmId: Int? = null,
     state: AlarmDetailState,
     onAction: (AlarmDetailAction) -> Unit,
 ) {
-    if(state.showAlarmNameDialog){
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(alarmId) {
+        onAction(AlarmDetailAction.OnLoadAlarm(alarmId))
+    }
+
+    val timeInputState =
+        rememberTimeInputState(state.hourField, state.minuteField) { hour, minute ->
+            onAction(AlarmDetailAction.OnTimeChange(hour, minute))
+        }
+
+    if (state.showAlarmNameDialog) {
         AlarmFieldChangeDialog(
             onSaveClicked = { onAction(AlarmDetailAction.OnSaveAlarmName(it)) },
-            fieldText = state.alarmName,
+            fieldText = state.alarm?.title ?: "",
             onDismiss = {
                 onAction(AlarmDetailAction.OnDismissAlarmNameDialog)
             },
@@ -42,8 +60,15 @@ fun AlarmDetailScreen(
         CenterAlignedTopAppBar(
             title = {
                 AlarmDetailAppBar(
-                    onBackClick = {onAction(AlarmDetailAction.OnBackClick)},
-                    onSaveClick = {onAction(AlarmDetailAction.OnSaveClick)},
+                    isAlarmValid = state.isAlarmValid,
+                    onBackClick = {
+                        keyboardController?.hide()
+                        onAction(AlarmDetailAction.OnBackClick)
+                    },
+                    onSaveClick = {
+                        keyboardController?.hide()
+                        onAction(AlarmDetailAction.OnSaveClick)
+                    },
                     modifier = Modifier
                 )
             },
@@ -53,7 +78,6 @@ fun AlarmDetailScreen(
             )
         )
 
-
     }) { innerPadding ->
         Column(
             modifier = modifier
@@ -61,14 +85,16 @@ fun AlarmDetailScreen(
                 .padding(horizontal = 16.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            AlarmTimeInput { _, _ -> }
+            AlarmTimeInput(
+                state = timeInputState
+            )
             AlarmSetting(
                 title = "Alarm Name",
                 onClick = {
                     onAction(AlarmDetailAction.OnAlarmNameClick)
                 },
                 trailingContent = {
-                    Text("Work", style = MaterialTheme.typography.bodyMedium)
+                    Text(state.alarmName ?: "N/A", style = MaterialTheme.typography.bodyMedium)
                 }
             )
         }
@@ -76,12 +102,13 @@ fun AlarmDetailScreen(
 
 }
 
+
 @Preview
 @Composable
 private fun AlarmDetailDialogPreview() {
     SnoozelooBackground {
         AlarmDetailScreen(
-            alarmId = "1",
+            alarmId = 1,
             state = AlarmDetailState(),
             onAction = {},
             modifier = Modifier.systemBarsPadding()

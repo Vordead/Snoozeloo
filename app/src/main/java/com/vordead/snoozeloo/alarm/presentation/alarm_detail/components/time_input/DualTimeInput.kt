@@ -1,5 +1,6 @@
-package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components
+package com.vordead.snoozeloo.alarm.presentation.alarm_detail.components.time_input
 
+import android.R.attr.bottom
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -35,20 +35,27 @@ import androidx.compose.ui.unit.dp
 import com.vordead.snoozeloo.R
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.hourInput
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.minuteInput
+import java.time.LocalDateTime
+import java.time.LocalTime
+import kotlin.text.toIntOrNull
 
 @Composable
 fun AlarmTimeInput(
+    state: TimeInputState,
     modifier: Modifier = Modifier,
-    onTimeChange: (String, String) -> Unit
 ) {
-    val hourTextInputState = rememberTextFieldState("")
-    val minuteTextInputState = rememberTextFieldState("")
 
     var shouldShowTimeLeft by remember { mutableStateOf(false) }
+    var remainingTime by remember { mutableStateOf("") }
 
-    LaunchedEffect(hourTextInputState.text, minuteTextInputState.text) {
+    LaunchedEffect(state.hourState.text, state.minuteState.text) {
         shouldShowTimeLeft =
-            hourTextInputState.text.isNotEmpty() && minuteTextInputState.text.isNotEmpty()
+            state.hourState.text.isNotEmpty() && state.minuteState.text.isNotEmpty()
+        if (shouldShowTimeLeft) {
+            val hour = state.hourState.text.toString().toIntOrNull() ?: 0
+            val minute = state.minuteState.text.toString().toIntOrNull() ?: 0
+            remainingTime = calculateRemainingTime(hour, minute)
+        }
     }
 
     Card(
@@ -68,7 +75,7 @@ fun AlarmTimeInput(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TimeInputField(
-                    state = hourTextInputState,
+                    state = state.hourState,
                     inputTransformation = InputTransformation.hourInput(),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 )
@@ -79,7 +86,7 @@ fun AlarmTimeInput(
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 TimeInputField(
-                    state = minuteTextInputState,
+                    state = state.minuteState,
                     inputTransformation = InputTransformation.minuteInput(),
                     modifier = Modifier
                 )
@@ -91,7 +98,7 @@ fun AlarmTimeInput(
                 exit = fadeOut()
             ) {
                 Text(
-                    "Alarm in 8h 13min",
+                    "Alarm in $remainingTime",
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
             }
@@ -102,5 +109,27 @@ fun AlarmTimeInput(
 @Preview
 @Composable
 fun AlarmTimeInputPreview() {
-    AlarmTimeInput(onTimeChange = { _, _ -> }, modifier = Modifier.systemBarsPadding())
+    AlarmTimeInput(
+        state = rememberTimeInputState(), modifier = Modifier.systemBarsPadding()
+    )
+}
+
+fun calculateRemainingTime(hour: Int, minute: Int): String {
+    val now = LocalDateTime.now().withSecond(0).withNano(0)
+    val alarmTime = LocalTime.of(hour, minute)
+    val alarmDateTime =
+        if (alarmTime.isAfter(now.toLocalTime()) || alarmTime == now.toLocalTime()) {
+            now.withHour(alarmTime.hour).withMinute(alarmTime.minute)
+        } else {
+            now.plusDays(1).withHour(alarmTime.hour).withMinute(alarmTime.minute)
+        }
+
+    val duration = java.time.Duration.between(now, alarmDateTime)
+    val hours = duration.toHours()
+    val minutes = duration.toMinutes() % 60
+
+    return when {
+        hours > 0 -> "${hours}h ${minutes}min"
+        else -> "${minutes}min"
+    }
 }

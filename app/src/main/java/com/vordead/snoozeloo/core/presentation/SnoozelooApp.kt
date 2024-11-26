@@ -1,4 +1,4 @@
-package com.vordead.snoozeloo.ui
+package com.vordead.snoozeloo.core.presentation
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
