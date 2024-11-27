@@ -1,7 +1,5 @@
 package com.vordead.snoozeloo.alarm.presentation.ringing
 
-import android.R.attr.onClick
-import android.R.attr.text
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

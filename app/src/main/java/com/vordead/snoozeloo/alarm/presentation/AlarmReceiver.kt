@@ -3,8 +3,6 @@ package com.vordead.snoozeloo.alarm.presentation
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.core.net.toUri
-import com.vordead.snoozeloo.MainActivity
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
