@@ -10,15 +10,7 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val alarmId = intent.getIntExtra("alarmId", -1)
         if (alarmId != -1) {
-            val deepLinkIntent = Intent(
-                Intent.ACTION_VIEW,
-                "snoozeloo://ringing/$alarmId".toUri(),
-                context,
-                MainActivity::class.java
-            ).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(deepLinkIntent)
+            NotificationHelper.showNotification(context, alarmId)
         }
     }
 }

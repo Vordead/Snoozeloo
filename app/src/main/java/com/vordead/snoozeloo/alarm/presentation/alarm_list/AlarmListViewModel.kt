@@ -3,6 +3,7 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vordead.snoozeloo.alarm.domain.AlarmDataSource
+import com.vordead.snoozeloo.alarm.presentation.ManageAlarmUseCase
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarm
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarmUi
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,11 +18,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 class AlarmListViewModel @Inject constructor(
-    private val localAlarmDataSource: AlarmDataSource
+    private val localAlarmDataSource: AlarmDataSource,
+    private val manageAlarmUseCase: ManageAlarmUseCase
+
 ) : ViewModel() {
 
     private val _alarmListEvents = Channel<AlarmListEvent>()
@@ -65,6 +69,16 @@ class AlarmListViewModel @Inject constructor(
                                 }
                             )
                         )
+                    }
+                    if (isChecked) {
+                        val triggerTime = Calendar.getInstance().apply {
+                            set(Calendar.HOUR_OF_DAY, updatedAlarm.hour)
+                            set(Calendar.MINUTE, updatedAlarm.minute)
+                            set(Calendar.SECOND, 0)
+                        }
+                        manageAlarmUseCase.scheduleAlarm(alarmId, triggerTime)
+                    } else {
+                        manageAlarmUseCase.unscheduleAlarm(alarmId)
                     }
                 }
             }
