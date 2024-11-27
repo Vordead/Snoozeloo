@@ -30,7 +30,9 @@ fun SnoozelooNavHost(modifier: Modifier = Modifier) {
             }
         )
 
-        alarmRingingDestination()
+        alarmRingingDestination(onNavigateBack = {
+            navController.navigateUp()
+        })
 
     }
 }

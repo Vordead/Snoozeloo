@@ -1,7 +1,10 @@
 package com.vordead.snoozeloo.alarm.presentation
 
 import android.content.Context
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -15,4 +18,10 @@ class ManageAlarmUseCase @Inject constructor(
     fun unscheduleAlarm(alarmId: Int) {
         AlarmScheduler.cancelAlarm(context, alarmId)
     }
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface ManageAlarmUseCaseEntryPoint {
+    fun manageAlarmUseCase(): ManageAlarmUseCase
 }
