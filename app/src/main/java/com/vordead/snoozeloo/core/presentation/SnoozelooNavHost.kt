@@ -1,4 +1,4 @@
-package com.vordead.snoozeloo.alarm.presentation
+package com.vordead.snoozeloo.core.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -8,6 +8,7 @@ import com.vordead.snoozeloo.alarm.presentation.alarm_detail.navigation.alarmDet
 import com.vordead.snoozeloo.alarm.presentation.alarm_detail.navigation.navigateToAlarmDetail
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.navigation.AlarmListNavigation
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.navigation.alarmListDestination
+import com.vordead.snoozeloo.alarm.presentation.ringing.navigation.alarmRingingDestination
 
 @Composable
 fun SnoozelooNavHost(modifier: Modifier = Modifier) {
@@ -28,5 +29,10 @@ fun SnoozelooNavHost(modifier: Modifier = Modifier) {
 
             }
         )
+
+        alarmRingingDestination(onNavigateBack = {
+            navController.navigateUp()
+        })
+
     }
 }

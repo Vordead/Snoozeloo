@@ -11,8 +11,8 @@ import javax.inject.Inject
 class LocalAlarmDataSource @Inject constructor(
     private val alarmDao: AlarmDao
 ) : AlarmDataSource {
-    override suspend fun upsertAlarm(alarm: Alarm) {
-        alarmDao.upsert(alarm.toEntityModel())
+    override suspend fun upsertAlarm(alarm: Alarm) : Long {
+         return alarmDao.upsert(alarm.toEntityModel())
     }
 
     override suspend fun delete(alarm: Alarm) {

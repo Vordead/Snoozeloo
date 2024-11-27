@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
+import java.time.LocalDateTime
 
 @Composable
 fun AlarmListItem(
@@ -50,7 +51,7 @@ fun AlarmListItem(
                 checked = alarmUi.isEnabled,
                 onCheckedChange = { onAlarmSwitchClick(it) }
             )
-            TimeDisplay(time = alarmUi.time, period = alarmUi.period)
+            TimeDisplay(time = alarmUi.time, period = "")
             AlarmFooter(alarmUi.remainingTime ?: "N/A")
         }
     }
@@ -143,9 +144,7 @@ private fun AlarmListItemPreview() {
             alarmUi = AlarmUi(
                 id = 1,
                 title = "Wake Up",
-                hour = 10,
-                minute = 14,
-                period = "AM",
+                dateTime = LocalDateTime.now(),
                 remainingTime = "30min",
                 isEnabled = true,
                 repeatDays = emptyList()

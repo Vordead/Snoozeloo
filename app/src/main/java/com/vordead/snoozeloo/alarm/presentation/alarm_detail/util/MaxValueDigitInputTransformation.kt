@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.forEachChange
+import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.placeCursorAtEnd
 import androidx.compose.foundation.text.input.then
 import androidx.compose.runtime.Stable
@@ -15,6 +16,8 @@ import androidx.compose.ui.text.input.KeyboardType
 @Stable
 fun InputTransformation.limitedInput(maxValue: Int): InputTransformation =
     this.then(MaxValueDigitInputTransformation(maxValue))
+        .then(InputTransformation.maxLength(2))
+
 
 
 @Stable

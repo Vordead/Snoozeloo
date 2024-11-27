@@ -3,6 +3,8 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vordead.snoozeloo.alarm.domain.AlarmDataSource
+import com.vordead.snoozeloo.alarm.presentation.ManageAlarmUseCase
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.AlarmUtils
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarm
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarmUi
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,13 +17,15 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
 class AlarmListViewModel @Inject constructor(
-    private val localAlarmDataSource: AlarmDataSource
+    private val localAlarmDataSource: AlarmDataSource,
+    private val manageAlarmUseCase: ManageAlarmUseCase
+
 ) : ViewModel() {
 
     private val _alarmListEvents = Channel<AlarmListEvent>()
@@ -37,7 +41,13 @@ class AlarmListViewModel @Inject constructor(
                     AlarmListState(uiState = AlarmListUiState.Success(alarms.map { it.toAlarmUi() }))
                 }
                 .catch { e ->
-                    emit(AlarmListState(uiState = AlarmListUiState.Error(e.message ?: "Unknown error")))
+                    emit(
+                        AlarmListState(
+                            uiState = AlarmListUiState.Error(
+                                e.message ?: "Unknown error"
+                            )
+                        )
+                    )
                 }
         }
         .stateIn(
@@ -50,21 +60,15 @@ class AlarmListViewModel @Inject constructor(
         viewModelScope.launch {
             val currentState = state.value.uiState
             if (currentState is AlarmListUiState.Success) {
-                val updatedAlarm = currentState.alarms.find { it.id == alarmId }?.copy(isEnabled = isChecked)
+                val updatedAlarm =
+                    currentState.alarms.find { it.id == alarmId }?.copy(isEnabled = isChecked)
                 if (updatedAlarm != null) {
                     localAlarmDataSource.upsertAlarm(updatedAlarm.toAlarm())
-                    _alarmListState.update {
-                        it.copy(
-                            uiState = AlarmListUiState.Success(
-                                currentState.alarms.map { alarm ->
-                                    if (alarm.id == alarmId) {
-                                        alarm.copy(isEnabled = isChecked)
-                                    } else {
-                                        alarm
-                                    }
-                                }
-                            )
-                        )
+                    if (isChecked) {
+                        val triggerTime = AlarmUtils.getTriggerTime(updatedAlarm.dateTime.hour, updatedAlarm.dateTime.minute)
+                        manageAlarmUseCase.scheduleAlarm(alarmId, triggerTime)
+                    } else {
+                        manageAlarmUseCase.unscheduleAlarm(alarmId)
                     }
                 }
             }

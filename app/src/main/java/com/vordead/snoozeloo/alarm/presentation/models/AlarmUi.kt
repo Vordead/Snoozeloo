@@ -1,42 +1,33 @@
 package com.vordead.snoozeloo.alarm.presentation.models
 
 import com.vordead.snoozeloo.alarm.domain.models.Alarm
+import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.collections.map
 
 data class AlarmUi(
     val id: Int? = null,
     val title: String? = null,
-    val hour: Int,
-    val minute: Int,
-    val period: String,
+    val dateTime: LocalDateTime,
     val isEnabled: Boolean = false,
     val remainingTime: String? = null,
     val repeatDays: List<DayOfWeek>
 ) {
     val time: String
-        get() = String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
+        get() = dateTime.format(DateTimeFormatter.ofPattern("hh:mm a", Locale.getDefault()))
 }
-
-enum class DayOfWeek {
-    Mo, Tu, We, Th, Fr, Sa, Su
-}
-
 
 fun Alarm.toAlarmUi(): AlarmUi {
-    val localTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"))
-    val hour = if (localTime.hour % 12 == 0) 12 else localTime.hour % 12
-    val period = if (localTime.hour < 12) "AM" else "PM"
-    val remainingTime = calculateRemainingTime(localTime)
+    val localDateTime = LocalDateTime.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"))
+    val remainingTime = calculateRemainingTime(localDateTime.toLocalTime())
 
     return AlarmUi(
         id = id,
         title = alarmName ?: "Alarm",
-        hour = hour,
-        minute = localTime.minute,
-        period = period,
+        dateTime = localDateTime,
         isEnabled = isEnabled,
         remainingTime = remainingTime,
         repeatDays = repeatDays.map { DayOfWeek.valueOf(it) }
@@ -47,7 +38,7 @@ fun AlarmUi.toAlarm(): Alarm {
     return Alarm(
         id = id,
         alarmName = title,
-        time = time,
+        time = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")),
         repeatDays = repeatDays.map { it.name },
         isEnabled = isEnabled
     )
@@ -71,4 +62,10 @@ fun calculateRemainingTime(alarmTime: LocalTime): String {
         hours > 0 -> "${hours}h ${minutes}min"
         else -> "${minutes}min"
     }
+}
+
+
+
+enum class DayOfWeek {
+    Mo, Tu, We, Th, Fr, Sa, Su
 }
