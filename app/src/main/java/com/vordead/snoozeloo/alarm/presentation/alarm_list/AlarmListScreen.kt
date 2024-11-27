@@ -1,7 +1,6 @@
 package com.vordead.snoozeloo.alarm.presentation.alarm_list
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -17,7 +16,6 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -31,6 +29,7 @@ import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.AppBar
 import com.vordead.snoozeloo.alarm.presentation.alarm_list.components.EmptyData
 import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.core.presentation.SnoozelooBackground
+import java.time.LocalDateTime
 
 @Composable
 fun AlarmListScreen(
@@ -128,11 +127,9 @@ private fun AlarmListScreenPreview() {
                         AlarmUi(
                             id = 1,
                             title = "Alarm 1",
-                            hour = 10,
-                            minute = 12,
-                            period = "AM",
                             remainingTime = "30min",
                             repeatDays = emptyList(),
+                            dateTime = LocalDateTime.now(),
                             isEnabled = true
                         ),
                     )

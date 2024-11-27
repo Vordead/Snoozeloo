@@ -16,9 +16,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,26 +55,16 @@ class AlarmListViewModel @Inject constructor(
                 val updatedAlarm = currentState.alarms.find { it.id == alarmId }?.copy(isEnabled = isChecked)
                 if (updatedAlarm != null) {
                     localAlarmDataSource.upsertAlarm(updatedAlarm.toAlarm())
-                    _alarmListState.update {
-                        it.copy(
-                            uiState = AlarmListUiState.Success(
-                                currentState.alarms.map { alarm ->
-                                    if (alarm.id == alarmId) {
-                                        alarm.copy(isEnabled = isChecked)
-                                    } else {
-                                        alarm
-                                    }
-                                }
-                            )
-                        )
-                    }
                     if (isChecked) {
-                        val triggerTime = Calendar.getInstance().apply {
-                            set(Calendar.HOUR_OF_DAY, updatedAlarm.hour)
-                            set(Calendar.MINUTE, updatedAlarm.minute)
-                            set(Calendar.SECOND, 0)
-                        }
-                        manageAlarmUseCase.scheduleAlarm(alarmId, triggerTime)
+//                        val triggerTime = Calendar.getInstance().apply {
+//                            set(Calendar.HOUR_OF_DAY, updatedAlarm.hour)
+//                            set(Calendar.MINUTE, updatedAlarm.minute)
+//                            set(Calendar.SECOND, 0)
+//                            if (before(Calendar.getInstance())) {
+//                                add(Calendar.DAY_OF_MONTH, 1)
+//                            }
+//                        }
+//                        manageAlarmUseCase.scheduleAlarm(alarmId, triggerTime)
                     } else {
                         manageAlarmUseCase.unscheduleAlarm(alarmId)
                     }

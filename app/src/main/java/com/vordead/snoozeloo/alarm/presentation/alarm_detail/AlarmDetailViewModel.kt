@@ -2,7 +2,6 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vordead.snoozeloo.alarm.data.local.LocalAlarmDataSource
 import com.vordead.snoozeloo.alarm.domain.AlarmDataSource
 import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarm
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,8 +40,8 @@ class AlarmDetailViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     alarm = alarm,
-                    hourField = alarm?.hour?.toString()?.padStart(2, '0') ?: "",
-                    minuteField = alarm?.minute?.toString()?.padStart(2, '0') ?: "",
+                    hourField = alarm?.dateTime?.hour?.toString()?.padStart(2,'0') ?: "",
+                    minuteField = alarm?.dateTime?.minute?.toString()?.padStart(2,'0') ?: "",
                     alarmName = alarm?.title,
                 )
             }
@@ -73,15 +73,20 @@ class AlarmDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val currentState = _uiState.value
             if (currentState.isAlarmValid) {
+                val hour = currentState.hourField.toIntOrNull() ?: 0
+                val minute = currentState.minuteField.toIntOrNull() ?: 0
+                val dateTime = LocalDateTime.now()
+                    .withHour(hour)
+                    .withMinute(minute)
+                    .withSecond(0)
+                    .withNano(0)
+
                 val alarm = currentState.alarm?.copy(
-                    title = if(currentState.alarmName?.isNotBlank() == true) currentState.alarmName else null,
-                    hour = currentState.hourField.toIntOrNull() ?: 0,
-                    minute = currentState.minuteField.toInt()
+                    title = if (currentState.alarmName?.isNotBlank() == true) currentState.alarmName else null,
+                    dateTime = dateTime
                 ) ?: AlarmUi(
-                    title = if(currentState.alarmName?.isNotBlank() == true) currentState.alarmName else null,
-                    hour = currentState.hourField.toIntOrNull() ?: 0,
-                    minute = currentState.minuteField.toIntOrNull() ?: 0,
-                    period = "", // Set default or handle accordingly
+                    title = if (currentState.alarmName?.isNotBlank() == true) currentState.alarmName else null,
+                    dateTime = dateTime,
                     isEnabled = true,
                     repeatDays = emptyList()
                 )
