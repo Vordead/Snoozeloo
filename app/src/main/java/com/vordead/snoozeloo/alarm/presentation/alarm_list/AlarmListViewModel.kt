@@ -68,6 +68,7 @@ class AlarmListViewModel @Inject constructor(
                             set(Calendar.HOUR_OF_DAY, updatedAlarm.dateTime.hour)
                             set(Calendar.MINUTE, updatedAlarm.dateTime.minute)
                             set(Calendar.SECOND, 0)
+                            set(Calendar.MILLISECOND, 0)
 //                            if (before(Calendar.getInstance())) {
 //                                add(Calendar.DAY_OF_MONTH, 1)
 //                            }
