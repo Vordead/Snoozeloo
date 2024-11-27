@@ -29,6 +29,18 @@ class MainActivity : ComponentActivity() {
                 1
             )
         }
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.YEAR, 2024)
+            set(Calendar.MONTH, Calendar.NOVEMBER)
+            set(Calendar.DAY_OF_MONTH, 27)
+            set(Calendar.HOUR_OF_DAY, 19) // 7 PM
+            set(Calendar.MINUTE, 55) // 55 minutes
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val timeInMillis = calendar.timeInMillis
+        println("Time in milliseconds: $timeInMillis")
         installSplashScreen()
         enableEdgeToEdge()
         setContent {
