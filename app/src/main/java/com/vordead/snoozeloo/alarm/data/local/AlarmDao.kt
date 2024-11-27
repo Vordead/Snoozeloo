@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface AlarmDao {
 
     @Upsert
-    suspend fun upsert(alarmEntity: AlarmEntity)
+    suspend fun upsert(alarmEntity: AlarmEntity) : Long
 
     @Delete
     suspend fun delete(alarmEntity: AlarmEntity)

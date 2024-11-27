@@ -3,6 +3,8 @@ package com.vordead.snoozeloo.alarm.presentation.alarm_detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vordead.snoozeloo.alarm.domain.AlarmDataSource
+import com.vordead.snoozeloo.alarm.presentation.ManageAlarmUseCase
+import com.vordead.snoozeloo.alarm.presentation.alarm_detail.util.AlarmUtils
 import com.vordead.snoozeloo.alarm.presentation.models.AlarmUi
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarm
 import com.vordead.snoozeloo.alarm.presentation.models.toAlarmUi
@@ -20,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AlarmDetailViewModel @Inject constructor(
     private val localAlarmDataSource: AlarmDataSource,
+    private val manageAlarmUseCase: ManageAlarmUseCase,
 ) : ViewModel() {
 
     private val _alarmDetailEvents = Channel<AlarmDetailEvent>()
@@ -90,7 +93,9 @@ class AlarmDetailViewModel @Inject constructor(
                     isEnabled = true,
                     repeatDays = emptyList()
                 )
-                localAlarmDataSource.upsertAlarm(alarm.toAlarm())
+                val addedAlarmId = localAlarmDataSource.upsertAlarm(alarm.toAlarm())
+                val triggerTime = AlarmUtils.getTriggerTime(alarm.dateTime.hour, alarm.dateTime.minute)
+                manageAlarmUseCase.scheduleAlarm(addedAlarmId.toInt(), triggerTime)
                 _alarmDetailEvents.send(AlarmDetailEvent.NavigateBack)
             }
         }
