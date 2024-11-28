@@ -1,6 +1,7 @@
 package com.vordead.snoozeloo.alarm.presentation.ringing.navigation
 
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
@@ -8,6 +9,7 @@ import androidx.navigation.toRoute
 import com.vordead.snoozeloo.DEEPLINK_DOMAIN
 import com.vordead.snoozeloo.alarm.presentation.ManageAlarmUseCaseEntryPoint
 import com.vordead.snoozeloo.alarm.presentation.ringing.RingingScreen
+import com.vordead.snoozeloo.alarm.presentation.ringing.RingingScreenViewModel
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.serialization.Serializable
 
@@ -31,12 +33,11 @@ fun NavGraphBuilder.alarmRingingDestination(
         val entryPoint = EntryPointAccessors.fromApplication(context, ManageAlarmUseCaseEntryPoint::class.java)
         val manageAlarmUseCase = entryPoint.manageAlarmUseCase()
 
+        val vm = hiltViewModel<RingingScreenViewModel>()
         val args = backStackEntry.toRoute<AlarmRingingDestination>()
         val alarmId = args.alarmId
         RingingScreen(alarmId = alarmId, onTurnOffClick = {
-            if (alarmId != null) {
-                manageAlarmUseCase.unscheduleAlarm(alarmId)
-            }
+            vm.turnOffAlarm(alarmId)
             onNavigateBack()
         })
     }
