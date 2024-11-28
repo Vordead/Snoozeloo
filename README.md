@@ -49,7 +49,7 @@ To get a local copy up and running, follow these simple steps:
 
 1. **Clone the repository:**
     ```sh
-    git clone https://github.com/yourusername/snoozeloo.git
+    git clone https://github.com/vordead/snoozeloo.git
     ```
 
 2. **Open the project in Android Studio:**
@@ -65,4 +65,4 @@ To get a local copy up and running, follow these simple steps:
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-Project Link: [https://github.com/yourusername/snoozeloo](https://github.com/yourusername/snoozeloo)
+Project Link: [https://github.com/vordead/snoozeloo](https://github.com/vordead/snoozeloo)
